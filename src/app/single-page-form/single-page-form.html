@@ -1,0 +1,279 @@
+<div class="h-min flex flex-col bg-gray-50 max-w-7xl mx-auto">
+
+  <!-- Top Navbar -->
+  <div
+    class="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+    <div routerLink="" class="flex gap-2 text-gray-600 hover:text-gray-900 cursor-pointer">
+      <i class="bi bi-arrow-left text-black"></i>
+      <span class="text-sm font-medium">Back to Forms</span>
+    </div>
+
+    <div class="flex flex-col mr-20 md:text-left">
+      <h1 class="text-lg font-semibold text-gray-900">Single Page Form Designer</h1>
+      <p class="text-sm text-gray-500">Create a simple single-page form with all fields visible</p>
+    </div>
+
+    <div class="flex gap-2 justify-center md:justify-end">
+      <button
+        class="inline-flex items-center justify-center text-sm font-medium border rounded-md gap-1.5 px-3 py-1 hover:bg-gray-100">
+        <i class="bi bi-eye"></i> Preview
+      </button>
+      <button
+        class="inline-flex items-center justify-center text-sm font-medium border rounded-md gap-1.5 px-3 py-1 bg-black text-white hover:bg-gray-800"
+        (click)="saveForm()">  
+        <i class="bi bi-floppy"></i> Save Form
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="flex flex-1 overflow-hidden flex-col md:flex-row">
+
+    <!-- Left Sidebar -->
+    <div class="w-full md:w-72 bg-white border-r border-gray-200 flex flex-col">
+      <div class="flex p-1 gap-2 bg-gray-100 rounded-xl m-4">
+        <button class="flex-1 border rounded-lg px-3 py-1 text-sm font-medium"
+          [class.bg-white]="selectedTab === 'field-types'" (click)="setTab('field-types')">Field Types</button>
+        <button class="flex-1 border rounded-lg px-3 py-1 text-sm font-medium"
+          [class.bg-white]="selectedTab === 'attribute'" (click)="setTab('attribute')">Attributes</button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4">
+        <!-- Field Types -->
+        <div *ngIf="selectedTab === 'field-types'">
+          <h3 class="text-sm font-medium text-gray-700 mb-3">Basic</h3>
+          <div class="space-y-2">
+            <div *ngFor="let field of fieldTypes" (click)="addfield(field)"
+              class="flex items-center gap-3 p-3 rounded-md border border-gray-200 hover:border-blue-400 hover:bg-blue-50 cursor-pointer">
+              <i class="bi {{field.icon}} text-lg"></i>
+              <span class="text-sm font-medium">{{field.name}}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attributes -->
+        <div *ngIf="selectedTab === 'attribute'" class="space-y-3">
+          <div *ngFor="let attributes of Attribute"
+            class="flex items-start gap-3 p-4 rounded-md border shadow-sm hover:shadow-md cursor-pointer">
+            <i class="bi {{attributes.icon}} text-xl text-blue-700"></i>
+            <div>
+              <h4 class="text-sm font-medium text-gray-900">{{attributes.attributeName}}</h4>
+              <p class="text-xs text-gray-500">{{attributes.attributeDiscription}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle Preview Panel -->
+    <div class="flex-1 flex flex-col bg-gray-100">
+      <div
+        class="bg-white border-b border-gray-200 px-6 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-sm font-medium text-gray-700">Preview:</span>
+          <div class="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+            <button class="h-8 w-8 flex items-center justify-center rounded" (click)="setPreview('phone')"
+              [class.bg-white]="previewMode==='phone'">
+              <i class="bi bi-phone text-lg"></i>
+            </button>
+            <button class="h-8 w-8 flex items-center justify-center rounded" (click)="setPreview('tablet')"
+              [class.bg-white]="previewMode==='tablet'">
+              <i class="bi bi-tablet text-lg"></i>
+            </button>
+            <button class="h-8 w-8 flex items-center justify-center rounded" (click)="setPreview('desktop')"
+              [class.bg-white]="previewMode==='desktop'">
+              <i class="bi bi-display text-lg"></i>
+            </button>
+          </div>
+          <span class="border rounded-xl px-2 py-0.5 text-xs font-medium">Single Page Form</span>
+        </div>
+      </div>
+
+      <div class="flex-1 flex flex-col lg:flex-row p-4 sm:p-6 gap-6 overflow-auto">
+        <!-- Form Preview Card -->
+        <div class="flex-1 flex justify-center">
+          <form (ngSubmit)="submitForm()" #formRef="ngForm"
+            class="bg-white rounded-lg shadow border p-6 w-full transition-all" [ngClass]="{
+             'max-w-xs': previewMode==='phone',
+             'max-w-md': previewMode==='tablet',
+             'max-w-4xl': previewMode==='desktop'
+           }">
+
+            <h2 class="text-lg font-semibold text-gray-900 mb-1">Form Title</h2>
+            <p class="text-sm text-gray-500 mb-4">Form description goes here</p>
+
+            <div class="space-y-4" *ngIf="activeFields.length === 0">
+              <div class="text-center py-12 text-gray-500">
+                <i class="bi bi-file-earmark-text text-5xl text-gray-300"></i>
+                <p class="text-lg font-medium mb-2 mt-3">No Fields Added Yet</p>
+                <p class="text-sm">Click field types from the left sidebar to get started</p>
+              </div>
+            </div>
+
+
+            <div *ngFor="let field of activeFields; let i = index"
+              class="relative group p-4 rounded-lg border-2 border-blue-400 bg-blue-50 mb-4 cursor-pointer"
+              (click)="selectField(i)" [class.border-blue-600]="selectedFieldIndex === i">
+
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                {{field.label}}
+                <span *ngIf="field.required" class="text-red-500">*</span>
+              </label>
+
+              <!-- Text/Number/Email/URL -->
+              <input
+                *ngIf="field.type !== 'textarea' && field.type !== 'Check Box' && field.type !== 'dropdown' && field.type !== 'radio'"
+                [type]="field.type" [placeholder]="field.placeholder" [(ngModel)]="field.value" name="field{{i}}"
+                class="w-full border rounded-md px-3 py-2 text-sm" />
+
+              <!-- Textarea -->
+              <textarea *ngIf="field.type === 'textarea'" [placeholder]="field.placeholder" [(ngModel)]="field.value"
+                name="field{{i}}" class="w-full border rounded-md px-3 py-2 text-sm"></textarea>
+
+              <!-- Checkbox -->
+              <div *ngIf="field.type === 'Check Box'" class="flex flex-col gap-2 mt-2">
+                <div *ngFor="let option of field.options" class="flex items-center gap-2">
+                  <input type="checkbox" [(ngModel)]="field.selectedOptions[option]" name="{{option}}-{{i}}"
+                    class="w-4 h-4 text-blue-600 border-gray-300 rounded" />
+                  <label class="text-sm text-gray-700">{{ option }}</label>
+                </div>
+              </div>
+
+              <!-- Dropdown -->
+              <div *ngIf="field.type === 'dropdown'" class="mt-2">
+                <select [(ngModel)]="field.value" name="dropdown{{i}}"
+                  class="w-full border rounded-md px-3 py-2 text-sm">
+                  <option value="" disabled selected>{{ field.placeholder }}</option>
+                  <option *ngFor="let option of field.options" [value]="option">{{ option }}</option>
+                </select>
+              </div>
+
+              <!-- Radio Button -->
+              <div *ngIf="field.type === 'radio'" class="flex flex-col gap-2 mt-2">
+                <div *ngFor="let option of field.options" class="flex items-center gap-2">
+                  <input type="radio" [(ngModel)]="field.value" name="radio{{i}}" [value]="option"
+                    class="text-blue-600 border-gray-300" />
+                  <label class="text-sm text-gray-700">{{ option }}</label>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                <button class="border rounded p-1 text-gray-600 hover:bg-gray-100">
+                  <i class="bi bi-copy"></i>
+                </button>
+                <button (click)="removeField(i); $event.stopPropagation()"
+                  class="border rounded p-1 text-gray-600 hover:bg-gray-100">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit"
+              class="w-full bg-black text-white rounded-md py-2 text-sm font-medium hover:bg-gray-800">
+              Submit Form
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Properties Panel -->
+    <div class="w-full lg:w-80 bg-white border border-gray-200 rounded-lg ">
+      <div class="p-4 border-b">
+        <h3 class="text-lg font-semibold">Properties</h3>
+      </div>
+      <div class="p-4">
+        <h4 class="text-sm font-medium text-gray-900 mb-3">Field Settings</h4>
+
+        <ng-container *ngIf="selectedFieldIndex !== null; else noField">
+          <div class="space-y-4">
+            <div>
+              <label class="text-sm font-medium block mb-1">Field Label</label>
+              <input type="text" [(ngModel)]="activeFields[selectedFieldIndex].label"
+                class="w-full border rounded-md px-3 py-2 text-sm" />
+            </div>
+            <!-- Show placeholder normally -->
+            <div *ngIf="!['Check Box', 'dropdown', 'radio'].includes(activeFields[selectedFieldIndex].type)">
+              <label class="text-sm font-medium block mb-1">Placeholder</label>
+              <input type="text" [(ngModel)]="activeFields[selectedFieldIndex].placeholder"
+                class="w-full border rounded-md px-3 py-2 text-sm" />
+            </div>
+
+            <!-- Show options editor for checkbox, dropdown, radio -->
+            <div *ngIf="['Check Box','dropdown','radio'].includes(activeFields[selectedFieldIndex].type)">
+              <label class="text-sm font-medium block mb-2">Options</label>
+
+              <div class="space-y-2">
+                <div *ngFor="let opt of activeFields[selectedFieldIndex].options; let i = index; trackBy: trackByIndex"
+                  class="flex gap-2 items-center">
+                  <!-- unique name + id are important for stable NgModel behavior -->
+                  <input type="text" [(ngModel)]="activeFields[selectedFieldIndex].options[i]"
+                    name="option-{{selectedFieldIndex}}-{{i}}" [attr.id]="'option-' + selectedFieldIndex + '-' + i"
+                    class="flex-1 w-full border rounded-md px-3 py-2 text-sm" />
+                  <button type="button" (click)="removeOption(i)"
+                    class="border rounded-md px-2 text-gray-600 hover:bg-gray-100">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+
+                <button type="button" (click)="addOption()"
+                  class="w-full border rounded-md py-1 text-sm text-blue-600 hover:bg-blue-50">
+                  + Add Option
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-medium">Required Field</label>
+              <button type="button" (click)="toggleRequiredField()"
+                [class.bg-black]="activeFields[selectedFieldIndex].required"
+                [class.bg-gray-200]="!activeFields[selectedFieldIndex].required"
+                class="relative inline-flex h-6 w-11 items-center rounded-full transition">
+                <span [class.translate-x-6]="activeFields[selectedFieldIndex].required"
+                  [class.translate-x-1]="!activeFields[selectedFieldIndex].required"
+                  class="inline-block h-4 w-4 transform rounded-full bg-white transition"></span>
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-medium">Enable Validation</label>
+              <button type="button" (click)="isValidationEnabled = !isValidationEnabled"
+                [class.bg-black]="isValidationEnabled" [class.bg-gray-200]="!isValidationEnabled"
+                class="relative inline-flex h-6 w-11 items-center rounded-full transition">
+                <span [class.translate-x-6]="isValidationEnabled" [class.translate-x-1]="!isValidationEnabled"
+                  class="inline-block h-4 w-4 transform rounded-full bg-white transition"></span>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-template #noField>
+          <p class="text-gray-500 text-sm mt-4">Select a field to edit its properties</p>
+
+          <div class="mt-5">
+            <label for="" class="text-sm font-medium text-gray-900">Form title</label>
+            <input type="text" class="w-full border rounded-md px-3 py-2 text-sm placeholder:text-gray-900"
+              placeholder="Form Title">
+          </div>
+          <div class="mt-5">
+            <label for="" class="text-sm font-medium text-gray-900">Description</label>
+            <textarea name="" class="w-full border rounded-md px-3 py-2 text-sm placeholder:text-gray-900"
+              placeholder="Enter form description"></textarea>
+          </div>
+
+          <div class="flex items-center justify-between mt-5">
+            <label class="text-sm font-medium">Show Required Indicator</label>
+            <button type="button" (click)="isValidationEnabled = !isValidationEnabled"
+              [class.bg-black]="isValidationEnabled" [class.bg-gray-200]="!isValidationEnabled"
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition">
+              <span [class.translate-x-6]="isValidationEnabled" [class.translate-x-1]="!isValidationEnabled"
+                class="inline-block h-4 w-4 transform rounded-full bg-white transition"></span>
+            </button>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

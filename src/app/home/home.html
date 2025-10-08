@@ -1,0 +1,54 @@
+<div class="bg-gray-50 py-10">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">Choose Form Type</h1>
+    <p class="text-lg text-gray-500 mb-8">
+      Select the type of form you want to create based on your requirements
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div
+        *ngFor="let form of forms"
+        class="group bg-white rounded-xl p-8 flex flex-col border shadow-sm hover:shadow-md cursor-pointer transition-transform duration-200 ease-out transform hover:scale-[1.01] hover:z-10"
+
+        (click)="navigateToForm(form.route)"
+      >
+        <div class="flex items-center mb-4 relative justify-between">
+          <span class="inline-block px-3 py-1 rounded-xl" [ngClass]="form.iconBg">
+            <i [class]="'bi ' + form.iconClasses" style="font-size: 1.7rem;"></i>
+          </span>
+          <span class="text-xs px-3 py-1 rounded-full font-medium" [ngClass]="form.badgeBg">
+            {{ form.badgeText }}
+          </span>
+        </div>
+
+        <!-- Title changes to blue only when card hovered -->
+        <h2 class="text-lg font-medium text-gray-900 transition-colors group-hover:text-blue-600">
+          {{ form.title }}
+        </h2>
+
+        <p class="text-gray-500 mb-4">{{ form.description }}</p>
+
+        <div class="mb-4">
+          <div class="font-medium text-gray-800 mb-1">Key Features</div>
+          <div class="flex flex-wrap gap-2">
+            <span
+              *ngFor="let feature of form.keyFeatures"
+              class=" text-gray-700 border px-2 py-1 rounded-full text-sm font-medium"
+            >
+              {{ feature }}
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <div class="font-medium text-gray-800 mb-1">Best For</div>
+          <p class="text-gray-500 text-sm">{{ form.bestFor }}</p>
+          <p class="text-gray-500 text-sm mt-1">
+            Setup time: {{ form.setupTime }}
+            <i class="bi bi-arrow-right text-xl flex justify-end"></i>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

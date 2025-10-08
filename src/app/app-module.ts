@@ -6,6 +6,8 @@ import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MultiStepForm } from './multi-step-form/multi-step-form';
 import { CommonModule } from '@angular/common';
+import { Home } from './home/home';
+import { SinglePageForm } from './single-page-form/single-page-form';
 
 
 
@@ -14,6 +16,8 @@ import { CommonModule } from '@angular/common';
   declarations: [
     App,
     MultiStepForm,
+    Home,
+    SinglePageForm,
   ],
 
 
