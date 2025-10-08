@@ -20,7 +20,7 @@ export class Home {
       keyFeatures: ['Quick setup', 'Simple validation', 'Mobile responsive'],
       bestFor: 'Contact forms, feedback, simple data entry',
       setupTime: '5-15 minutes',
-      route: 'form/single-form'
+      route: 'single-form'
     },
     {
       title: 'Multi-Step Form',
@@ -31,7 +31,8 @@ export class Home {
       description: 'Break complex forms into manageable steps',
       keyFeatures: ['Progress tracking', 'Step validation', 'Save & resume'],
       bestFor: 'Registration, surveys, complex applications',
-      setupTime: '15-30 minutes'
+      setupTime: '15-30 minutes',
+      route: 'multi-form'
     }  
   ];
 
@@ -41,4 +42,5 @@ constructor ( private router: Router) {}
 navigateToForm(route: any){
   this.router.navigate([route])
 }
+
 }
