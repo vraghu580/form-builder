@@ -31,14 +31,18 @@ export interface FormStructure {
   styleUrl: './single-page-form.scss'
 })
 export class SinglePageForm {
-  activeFields: any[] = [];
+  // Fields array
+  activeFields: any[] = [ ];
   selectedFieldIndex: number | null = null;
+
   isValidationEnabled = false;
   selectedTab: 'field-types' | 'attribute' = 'field-types';
 
   formTitle: string = 'Form Title';
   formDescription: string = 'Form description goes here';
 
+  // Track if title or description is selected for editing in properties panel
+  selectedFormProperty: 'title' | 'description' | null = null;
 
   fieldTypes: FormField[] = [
     { type: 'text', icon: 'bi-fonts', name: 'Text Input', placeholder: 'Enter Your Name' },
@@ -52,9 +56,9 @@ export class SinglePageForm {
     { type: 'radio', icon: 'bi-record-circle', name: 'Radio Button', options: ['Option 1', 'Option 2'] }
   ];
 
-  Attribute:AttributeItem[] = [
+  Attribute: AttributeItem[] = [
     { icon: 'bi-fonts', attributeName: 'Simple Attribute', attributeDiscription: 'Single Value Field' },
-    { icon: 'bi-calculator', attributeName: 'Composite Attribute', attributeDiscription: 'Complex structure (address, name)' },
+    { icon: 'bi-calculator', attributeName: 'Composite Attribute', attributeDiscription: 'Complex structure (address, name)' }
   ];
 
   setTab(tab: 'field-types' | 'attribute') {
@@ -67,7 +71,7 @@ export class SinglePageForm {
       label: field.name,
       value: '',
       selectedOptions: {},
-      required: false,
+      required: false
     });
   }
 
@@ -82,6 +86,12 @@ export class SinglePageForm {
 
   selectField(index: number) {
     this.selectedFieldIndex = index;
+    this.selectedFormProperty = null; // deselect title/description
+  }
+
+  selectFormProperty(property: 'title' | 'description') {
+    this.selectedFormProperty = property;
+    this.selectedFieldIndex = null; // deselect fields
   }
 
   previewMode: 'phone' | 'tablet' | 'desktop' = 'desktop';
@@ -119,13 +129,13 @@ export class SinglePageForm {
 
   saveForm() {
     const formStructure: FormStructure = {
-    title: this.formTitle,
-    description: this.formDescription,
-    fields: this.activeFields
-  };
-      console.log('💾 Form Structure:', JSON.stringify(formStructure, null, 2));
-    }
-  
+      title: this.formTitle,
+      description: this.formDescription,
+      fields: this.activeFields
+    };
+    console.log('💾 Form Structure:', JSON.stringify(formStructure, null, 2));
+  }
+
   submitForm() {
     const submittedData: any = {};
     this.activeFields.forEach(field => {
