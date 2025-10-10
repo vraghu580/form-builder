@@ -1,0 +1,47 @@
+<div class="min-h-screen bg-gray-50 p-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-3xl font-semibold text-gray-800">📋 Choose a Form Template</h2>
+      <button (click)="exit()" class="text-gray-500 hover:text-red-600 text-2xl">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Template Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
+      <div *ngFor="let tmpl of templates"
+        class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 hover:border-blue-400 cursor-not-allowed">
+        <div class="flex justify-between items-start mb-4">
+          <h3 class="text-lg font-semibold text-gray-800">{{ tmpl.title }}</h3>
+          <span class="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-0.5">
+            {{ tmpl.category }}
+          </span>
+        </div>
+
+        <p class="text-sm text-gray-500 mb-4">{{ tmpl.description }}</p>
+
+        <div class="space-y-2">
+          <div *ngFor="let section of tmpl.sections">
+            <p class="font-medium text-gray-700">{{ section.title }}</p>
+            <div *ngFor="let sub of section.subsections" class="ml-3 mt-1">
+              <p class="text-gray-600 text-sm">{{ sub.title }}</p>
+              <ul class="list-disc list-inside text-gray-500 text-sm ml-2">
+                <li *ngFor="let f of sub.fields">
+                  {{ f.label }} <span class="text-xs text-gray-400">({{ f.type }})</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <button (click)="openTemplate(tmpl.id)"
+            class="w-full bg-black text-white text-sm rounded-lg py-2 hover:bg-gray-800 transition">
+            Choose Template
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

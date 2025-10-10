@@ -1,5 +1,29 @@
 import { Component } from '@angular/core';
 
+export interface FormField {
+  type: string;
+  icon: string;
+  name: string;
+  placeholder?: string;
+  options?: string[];
+  label?: string;
+  value?: string;
+  selectedOptions?: { [key: string]: boolean };
+  required?: boolean;
+}
+
+export interface AttributeItem {
+  icon: string;
+  attributeName: string;
+  attributeDiscription: string;
+}
+
+export interface FormStructure {
+  title: string;
+  description: string;
+  fields: FormField[];
+}
+
 @Component({
   selector: 'app-single-page-form',
   standalone: false,
@@ -12,7 +36,11 @@ export class SinglePageForm {
   isValidationEnabled = false;
   selectedTab: 'field-types' | 'attribute' = 'field-types';
 
-  fieldTypes = [
+  formTitle: string = 'Form Title';
+  formDescription: string = 'Form description goes here';
+
+
+  fieldTypes: FormField[] = [
     { type: 'text', icon: 'bi-fonts', name: 'Text Input', placeholder: 'Enter Your Name' },
     { type: 'number', icon: 'bi-hash', name: 'Number', placeholder: 'Enter a Number' },
     { type: 'email', icon: 'bi-envelope', name: 'Email', placeholder: 'Enter your Email' },
@@ -24,7 +52,7 @@ export class SinglePageForm {
     { type: 'radio', icon: 'bi-record-circle', name: 'Radio Button', options: ['Option 1', 'Option 2'] }
   ];
 
-  Attribute = [
+  Attribute:AttributeItem[] = [
     { icon: 'bi-fonts', attributeName: 'Simple Attribute', attributeDiscription: 'Single Value Field' },
     { icon: 'bi-calculator', attributeName: 'Composite Attribute', attributeDiscription: 'Complex structure (address, name)' },
   ];
@@ -90,18 +118,19 @@ export class SinglePageForm {
   }
 
   saveForm() {
-    if (this.activeFields.length === 0) {
-      console.warn('⚠️ No fields added to form.');
-    } else {
-      console.log('💾 Form Structure:', JSON.stringify(this.activeFields, null, 2));
+    const formStructure: FormStructure = {
+    title: this.formTitle,
+    description: this.formDescription,
+    fields: this.activeFields
+  };
+      console.log('💾 Form Structure:', JSON.stringify(formStructure, null, 2));
     }
-  }
-
+  
   submitForm() {
     const submittedData: any = {};
     this.activeFields.forEach(field => {
       if (field.type === 'Check Box') {
-        const selected = Object.keys(field.selectedOptions).filter(key => field.selectedOptions[key]);
+        const selected = Object.keys(field.selectedOptions).filter(key => field.selectedOptions?.[key]);
         submittedData[field.label] = selected;
       } else {
         submittedData[field.label] = field.value || '';
@@ -109,5 +138,4 @@ export class SinglePageForm {
     });
     console.log('✅ Form Submitted Data:', submittedData);
   }
-
 }

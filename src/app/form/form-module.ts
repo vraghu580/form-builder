@@ -1,0 +1,21 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormTemplates } from './form-templates/form-templates';
+import { FormRoutingModule } from './form-routing-module';
+import { FormPage } from './form-page/form-page';
+import { FormsModule } from '@angular/forms';
+
+
+
+@NgModule({
+  declarations: [
+    FormTemplates,
+    FormPage
+  ],
+  imports: [
+    CommonModule,
+    FormRoutingModule,
+    FormsModule
+  ]
+})
+export class FormModule { }
