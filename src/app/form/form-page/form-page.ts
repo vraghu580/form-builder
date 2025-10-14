@@ -1,16 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { Template } from '../../template';
 
-type FieldType =
-  | 'text'
-  | 'number'
-  | 'email'
-  | 'url'
-  | 'textarea'
-  | 'checkbox'
-  | 'dropdown'
-  | 'radio';
+export interface FormField {
+  id?: string;
+  type: string;
+  icon?: string;
+  name?: string;
+  placeholder?: string;
+  options?: string[];
+  label?: string;
+  value?: any;
+  selectedOptions?: { [key: string]: boolean };
+  required?: boolean;
+}
 
 export interface AttributeItem {
   icon: string;
@@ -18,16 +21,25 @@ export interface AttributeItem {
   attributeDiscription: string;
 }
 
-type BuilderNodeType = 'section' | 'subsection' | 'field';
-
-interface BuilderField {
+export interface SubSectionItem {
   id: string;
-  type: FieldType;
-  label: string;
-  placeholder?: string;
-  value?: string;
-  options?: string[];
-  selectedOptions?: string[];
+  title: string;
+  fields: FormField[];
+}
+
+export interface SectionItem {
+  id: string;
+  itemType: 'section';
+  title: string;
+  subsections: SubSectionItem[];
+  fields: FormField[];
+}
+
+export interface FormStructure {
+  title: string;
+  description: string;
+  fields: any[];
+  formType?: string;
 }
 
 @Component({
@@ -36,222 +48,344 @@ interface BuilderField {
   templateUrl: './form-page.html',
   styleUrls: ['./form-page.scss'],
 })
-export class FormPage implements OnInit {
-  selectedTab: 'field-types' | 'attribute' = 'field-types';
-  templateId!: number;
-  selectedTemplate: any = null;
+export class FormPage {
 
-  // Selection state
-  selectedSection: any = null;
-  selectedSubsection: any = null;
-  selectedField: BuilderField | null = null;
-  activeNodeType: BuilderNodeType | null = null;
 
-  // Sidebar attributes as actions
+  activeFields: any[] = [];
+
+  selectedEntityType: 'field' | 'section' | 'subsection' | null = null;
+  selectedEntityRef: any = null;
+  selectedFieldIndex: number | null = null;
+
+  selectedParentSectionIndex: number | null = null;
+  selectedParentSubsectionIndex: number | null = null;
+
+  isValidationEnabled = false;
+  selectedTab: 'sections' | 'attribute' = 'sections';
+  selectedFormProperty: 'title' | 'description' | null = null;
+
+  formTitle = 'Form Title';
+  formDescription = 'Form description goes here';
+  formType: string = '';
+  structuredFields: any[] = [];
+
+  fieldTypes: FormField[] = [
+    { type: 'text', name: 'Consumer Name', placeholder: 'Enter your name' },
+    { type: 'number', name: 'Consumer Id', placeholder: 'Enter a number' },
+    { type: 'text', name: 'Address', placeholder: 'Enter your Address' },
+    { type: 'number', name: 'Phone', placeholder: 'Enter phone number' },
+    { type: 'number', name: 'Order No:', placeholder: 'Enter a Order No' },
+    { type: 'Check Box', name: 'Checkbox', options: ['Option A', 'Option B'] },
+    { type: 'dropdown', name: 'Dropdown', placeholder: 'Select option', options: ['Option X', 'Option Y', 'Option Z'] },
+    { type: 'radio', name: 'Radio Button', options: ['Option 1', 'Option 2'] }
+  ];
+
   Attribute: AttributeItem[] = [
-    { icon: 'bi-fonts', attributeName: 'Section', attributeDiscription: '' },
-    { icon: 'bi-calculator', attributeName: 'Sub Section', attributeDiscription: '' },
+    { icon: 'bi-folder', attributeName: 'Section', attributeDiscription: 'Create a new section' },
+    { icon: 'bi-diagram-3', attributeName: 'Sub Section', attributeDiscription: 'Add a sub section to a section' },
   ];
 
-  // Field palette
-  fieldTypes = [
-    { type: 'text', icon: 'bi-fonts', name: 'Text Input', placeholder: 'Enter your name' },
-    { type: 'number', icon: 'bi-hash', name: 'Number', placeholder: 'Enter a number' },
-    { type: 'email', icon: 'bi-envelope', name: 'Email', placeholder: 'Enter your email' },
-    { type: 'number', icon: 'bi-telephone', name: 'Phone', placeholder: 'Enter phone number' },
-    { type: 'url', icon: 'bi-link-45deg', name: 'URL', placeholder: 'Enter a URL' },
-    { type: 'textarea', icon: 'bi-file-earmark-text', name: 'Text Area', placeholder: 'Enter description' },
-    { type: 'checkbox', icon: 'bi-check-square', name: 'Checkbox', options: ['Option A', 'Option B'] },
-    { type: 'dropdown', icon: 'bi-caret-down-square', name: 'Dropdown', options: ['Option X', 'Option Y', 'Option Z'] },
-    { type: 'radio', icon: 'bi-record-circle', name: 'Radio Button', options: ['Option 1', 'Option 2'] },
+  attributeTypes = [
+    { label: 'Text', value: 'text' },
+    { label: 'Number', value: 'number' },
+    { label: 'Email', value: 'email' },
+    { label: 'Date', value: 'date' },
+    { label: 'Checkbox', value: 'Check Box' },
+    { label: 'Radio', value: 'radio' },
+    { label: 'Dropdown', value: 'dropdown' },
+    { label: 'Textarea', value: 'textarea' },
+    { label: 'Password', value: 'password' },
+    { label: 'Tel', value: 'tel' },
+    { label: 'URL', value: 'url' },
+    { label: 'Time', value: 'time' },
+    { label: 'Datetime Local', value: 'datetime-local' },
+    { label: 'File', value: 'file' },
+    { label: 'Range', value: 'range' },
+    { label: 'Color', value: 'color' }
   ];
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private templateService: Template
-  ) {}
+  constructor(private templateService: Template, private router: Router) { }
 
-  setTab(tab: 'field-types' | 'attribute') {
+  ngOnInit() {
+    const selectedTemplate = this.templateService.getTemplate();
+
+    if (selectedTemplate) {
+      this.formTitle = selectedTemplate.title || 'Form Title';
+      this.formDescription = selectedTemplate.description || 'Form description goes here';
+      this.formType = selectedTemplate.type || 'unknown';
+
+      if (selectedTemplate.sections && selectedTemplate.sections.length > 0) {
+        this.activeFields = selectedTemplate.sections.map((section: any) => ({
+          itemType: 'section',
+          title: section.section || 'Untitled Section',
+          fields: (section.fields || []).map((f: any) => ({
+            label: f.label,
+            type: f.type,
+            placeholder: f.label,
+            value: '',
+            required: false,
+            options: f.options || []
+          })),
+          subsections: (section.subsections || []).map((sub: any) => ({
+            title: sub.subsection || 'Untitled Subsection',
+            fields: (sub.fields || []).map((sf: any) => ({
+              label: sf.label,
+              type: sf.type,
+              placeholder: sf.label,
+              value: '',
+              required: false,
+              options: sf.options || []
+            }))
+          }))
+        }));
+      }
+
+    }
+  }
+
+  private generateId(prefix = '') {
+    return prefix + (crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2));
+  }
+
+  setTab(tab: 'sections' | 'attribute') {
     this.selectedTab = tab;
   }
 
-  ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.templateId = id ? +id : NaN;
-    this.selectedTemplate = this.templateService.getTemplate();
-
-    if (this.selectedTemplate) {
-      // Ensure structure
-      if (!Array.isArray(this.selectedTemplate.sections)) {
-        this.selectedTemplate.sections = [];
-      }
-      this.selectedTemplate.sections.forEach((section: any) => {
-        section.fields = Array.isArray(section.fields) ? section.fields : [];
-        section.subsections = Array.isArray(section.subsections) ? section.subsections : [];
-        section.subsections.forEach((sub: any) => {
-          sub.fields = Array.isArray(sub.fields) ? sub.fields : [];
-        });
-      });
+  handleAttributeClick(attr: AttributeItem) {
+    if (attr.attributeName === 'Section') {
+      this.addSection();
+    } else if (attr.attributeName === 'Sub Section') {
+      this.addSubSection();
     }
   }
 
-  // Navigation
-  backToTemplates() {
-    this.router.navigate(['/form', 'form-temp']);
+  addSection() {
+    const section: SectionItem = {
+      id: this.generateId('sec-'),
+      itemType: 'section',
+      title: 'New Section',
+      subsections: [],
+      fields: []
+    };
+    this.activeFields.push(section);
+    this.selectSection(this.activeFields.length - 1);
   }
 
-  // Selection helpers
-  selectSection(section: any) {
-    this.selectedSection = section;
-    this.selectedSubsection = null;
-    this.selectedField = null;
-    this.activeNodeType = 'section';
-  }
-
-  selectSubsection(sub: any, parentSection?: any) {
-    if (parentSection) {
-      this.selectedSection = parentSection;
-    }
-    this.selectedSubsection = sub;
-    this.selectedField = null;
-    this.activeNodeType = 'subsection';
-  }
-
-  selectField(f: BuilderField, parentSection: any, parentSub?: any) {
-    this.selectedSection = parentSection;
-    this.selectedSubsection = parentSub || null;
-    this.selectedField = f;
-    this.activeNodeType = 'field';
-  }
-
-addSection() {
-  if (!this.selectedTemplate) return;
-  const newSection = {
-    id: crypto.randomUUID?.() ?? Math.random().toString(36).slice(2),
-    title: 'New Section',
-    fields: [] as BuilderField[],
-    subsections: [] as any[],
-  };
-  this.selectedTemplate.sections.push(newSection);
-  this.selectSection(newSection);
-}
-
-addSubsection() {
-  if (!this.selectedSection) {
-    alert('Select a Section first to add a Sub Section.');
-    return;
-  }
-  const newSub = {
-    id: crypto.randomUUID?.() ?? Math.random().toString(36).slice(2),
-    title: 'New Sub Section',
-    fields: [] as BuilderField[],
-  };
-  this.selectedSection.subsections.push(newSub);
-  this.selectSubsection(newSub, this.selectedSection);
-}
-
-
-  // Add Field to current selection
-  addField(field: any) {
-    if (!this.selectedSection && !this.selectedSubsection) {
-      alert('Select a Section or Sub Section before adding a field.');
+  addSubSection() {
+    if (this.selectedEntityType === 'section' && this.selectedParentSectionIndex !== null) {
+      const sectionIndex = this.selectedParentSectionIndex;
+      const subsection: SubSectionItem = {
+        id: this.generateId('sub-'),
+        title: 'New Sub Section',
+        fields: []
+      };
+      (this.activeFields[sectionIndex] as SectionItem).subsections.push(subsection);
+      this.selectSubsection(sectionIndex, (this.activeFields[sectionIndex] as SectionItem).subsections.length - 1);
       return;
     }
-    const newField: BuilderField = {
-      id: crypto.randomUUID?.() ?? Math.random().toString(36).slice(2),
-      type: field.type as FieldType,
-      label: field.name,
-      placeholder: field.placeholder || '',
-      value: '',
-      options: field.options || [],
-      selectedOptions: [],
+
+    const section: SectionItem = {
+      id: this.generateId('sec-'),
+      itemType: 'section',
+      title: 'New Section',
+      subsections: [],
+      fields: []
     };
-    if (this.selectedSubsection) {
-      this.selectedSubsection.fields.push(newField);
-      this.selectField(newField, this.selectedSection, this.selectedSubsection);
-    } else {
-      this.selectedSection.fields.push(newField);
-      this.selectField(newField, this.selectedSection);
+    const subsection: SubSectionItem = {
+      id: this.generateId('sub-'),
+      title: 'New Sub Section',
+      fields: []
+    };
+    section.subsections.push(subsection);
+    this.activeFields.push(section);
+    this.selectSubsection(this.activeFields.length - 1, 0);
+  }
+
+  addfield(field: any) {
+    const newField: FormField = {
+      ...field,
+      id: this.generateId('fld-'),
+      label: field.name,
+      value: '',
+      selectedOptions: {},
+      required: false,
+      options: Array.isArray(field.options) ? [...field.options] : undefined
+    };
+
+    if (this.selectedEntityType === 'subsection' && this.selectedParentSectionIndex !== null && this.selectedParentSubsectionIndex !== null) {
+      const parentSection = this.activeFields[this.selectedParentSectionIndex] as SectionItem;
+      parentSection.subsections[this.selectedParentSubsectionIndex].fields.push(newField);
+      return;
+    }
+
+    if (this.selectedEntityType === 'section' && this.selectedParentSectionIndex !== null) {
+      const section = this.activeFields[this.selectedParentSectionIndex] as SectionItem;
+      section.fields.push(newField);
+      // no auto-select
+      return;
+    }
+
+    this.activeFields.push(newField);
+  }
+
+  removeField(index: number) {
+    this.activeFields.splice(index, 1);
+    if (this.selectedEntityType === 'section' && this.selectedParentSectionIndex === index) {
+      this.clearSelection();
+    }
+    if (this.selectedEntityType === 'field' && this.selectedFieldIndex === index) {
+      this.clearSelection();
     }
   }
 
-removeField(container: { fields: BuilderField[] }, fieldId: string, ev?: MouseEvent) {
-  if (ev) ev.stopPropagation();
-  container.fields = (container.fields || []).filter(f => f.id !== fieldId);
-
-  if (this.selectedField?.id === fieldId) {
-    this.selectedField = null;
-    this.activeNodeType = this.selectedSubsection ? 'subsection' : 'section';
-  }
-}
-
-  // Properties panel bindings
-  updateSectionTitle(val: string) {
-    if (this.selectedSection) this.selectedSection.title = val;
+  removeNestedField(sectionIndex: number, fieldIndex: number) {
+    const section = this.activeFields[sectionIndex] as SectionItem;
+    if (!section) return;
+    section.fields.splice(fieldIndex, 1);
+    this.clearSelection();
   }
 
-  updateSubTitle(val: string) {
-    if (this.selectedSubsection) this.selectedSubsection.title = val;
+  removeNestedFieldInSub(sectionIndex: number, subIndex: number, fieldIndex: number) {
+    const section = this.activeFields[sectionIndex] as SectionItem;
+    if (!section) return;
+    section.subsections[subIndex].fields.splice(fieldIndex, 1);
+    this.clearSelection();
   }
 
-  updateFieldLabel(val: string) {
-    if (this.selectedField) this.selectedField.label = val;
+  clearSelection() {
+    this.selectedEntityType = null;
+    this.selectedEntityRef = null;
+    this.selectedFieldIndex = null;
+    this.selectedParentSectionIndex = null;
+    this.selectedParentSubsectionIndex = null;
+    this.selectedFormProperty = null;
   }
 
-  updateFieldPlaceholder(val: string) {
-    if (this.selectedField) this.selectedField.placeholder = val;
+  selectField(index: number) {
+    const item = this.activeFields[index];
+    if (!item) return;
+    if (item.itemType === 'section') {
+      this.selectSection(index);
+      return;
+    }
+    this.selectedEntityType = 'field';
+    this.selectedEntityRef = item;
+    this.selectedFieldIndex = index;
+    this.selectedParentSectionIndex = null;
+    this.selectedParentSubsectionIndex = null;
+    this.selectedFormProperty = null;
   }
 
-  updateOptionsCSV(val: string) {
-    if (this.selectedField) {
-      this.selectedField.options = val
-        .split(',')
-        .map(s => s.trim())
-        .filter(Boolean);
+  selectSection(sectionIndex: number) {
+    const sec = this.activeFields[sectionIndex];
+    if (!sec || sec.itemType !== 'section') return;
+    this.selectedEntityType = 'section';
+    this.selectedEntityRef = sec;
+    this.selectedParentSectionIndex = sectionIndex;
+    this.selectedParentSubsectionIndex = null;
+    this.selectedFieldIndex = null;
+    this.selectedFormProperty = null;
+  }
+
+  selectSubsection(sectionIndex: number, subsectionIndex: number) {
+    const sec = this.activeFields[sectionIndex] as SectionItem;
+    if (!sec) return;
+    const sub = sec.subsections[subsectionIndex];
+    if (!sub) return;
+    this.selectedEntityType = 'subsection';
+    this.selectedEntityRef = sub;
+    this.selectedParentSectionIndex = sectionIndex;
+    this.selectedParentSubsectionIndex = subsectionIndex;
+    this.selectedFieldIndex = null;
+    this.selectedFormProperty = null;
+  }
+
+  selectNestedField(sectionIndex: number, fieldIndex: number) {
+    const sec = this.activeFields[sectionIndex] as SectionItem;
+    if (!sec) return;
+    const f = sec.fields[fieldIndex];
+    if (!f) return;
+    this.selectedEntityType = 'field';
+    this.selectedEntityRef = f;
+    this.selectedParentSectionIndex = sectionIndex;
+    this.selectedParentSubsectionIndex = null;
+    this.selectedFieldIndex = null;
+    this.selectedFormProperty = null;
+  }
+
+  selectNestedFieldInSub(sectionIndex: number, subIndex: number, fieldIndex: number) {
+    const sec = this.activeFields[sectionIndex] as SectionItem;
+    if (!sec) return;
+    const sub = sec.subsections[subIndex];
+    if (!sub) return;
+    const f = sub.fields[fieldIndex];
+    if (!f) return;
+    this.selectedEntityType = 'field';
+    this.selectedEntityRef = f;
+    this.selectedParentSectionIndex = sectionIndex;
+    this.selectedParentSubsectionIndex = subIndex;
+    this.selectedFieldIndex = null;
+    this.selectedFormProperty = null;
+  }
+
+  selectFormProperty(property: 'title' | 'description') {
+    this.selectedFormProperty = property;
+    this.selectedEntityType = null;
+    this.selectedEntityRef = null;
+    this.selectedFieldIndex = null;
+    this.selectedParentSectionIndex = null;
+    this.selectedParentSubsectionIndex = null;
+  }
+
+  toggleRequiredField() {
+    if (this.selectedEntityType === 'field' && this.selectedEntityRef) {
+      this.selectedEntityRef.required = !this.selectedEntityRef.required;
     }
   }
 
-  // Convenience to show CSV in input
-  getOptionsCSV(): string {
-    return (this.selectedField?.options || []).join(', ');
-  }
-
-  // ...inside FormPage class
-
-// Delete a section
-deleteSection(sectionId: string) {
-  if (!this.selectedTemplate?.sections) return;
-  const idx = this.selectedTemplate.sections.findIndex((s: any) => s.id === sectionId);
-  if (idx > -1) {
-    // Clear selection if deleting selected node or its descendants
-    const deletingSelectedSection =
-      this.selectedSection && this.selectedSection.id === sectionId;
-    if (deletingSelectedSection) {
-      this.selectedSection = null;
-      this.selectedSubsection = null;
-      this.selectedField = null;
-      this.activeNodeType = null;
+  addOption() {
+    if (this.selectedEntityType === 'field' && this.selectedEntityRef) {
+      if (!Array.isArray(this.selectedEntityRef.options)) this.selectedEntityRef.options = [];
+      this.selectedEntityRef.options.push('New Option');
     }
-    this.selectedTemplate.sections.splice(idx, 1);
   }
-}
 
-// Delete a subsection (from its parent section)
-deleteSubsection(parentSectionId: string, subId: string) {
-  const parent = this.selectedTemplate?.sections?.find((s: any) => s.id === parentSectionId);
-  if (!parent) return;
-  const idx = parent.subsections.findIndex((sub: any) => sub.id === subId);
-  if (idx > -1) {
-    const deletingSelectedSub =
-      this.selectedSubsection && this.selectedSubsection.id === subId;
-    if (deletingSelectedSub) {
-      this.selectedSubsection = null;
-      this.selectedField = null;
-      this.activeNodeType = this.selectedSection ? 'section' : null;
+  removeOption(i: number) {
+    if (this.selectedEntityType === 'field' && this.selectedEntityRef && Array.isArray(this.selectedEntityRef.options)) {
+      this.selectedEntityRef.options.splice(i, 1);
     }
-    parent.subsections.splice(idx, 1);
   }
-}
 
+  saveForm() {
+    const formStructure: FormStructure = {
+      formType: this.formType,
+      title: this.formTitle,
+      description: this.formDescription,
+      fields: this.activeFields
+    };
+    console.log('💾 Form Structure:', JSON.stringify(formStructure, null, 2));
+  }
+
+  submitForm() {
+    const submittedData: any = {};
+
+    this.activeFields.forEach(item => {
+      if (item?.itemType === 'section') {
+        submittedData[item.title] = item;
+      } else {
+        if (item.type === 'Check Box') {
+          const selected = Object.keys(item.selectedOptions || {}).filter(k => item.selectedOptions?.[k]);
+          submittedData[item.label] = selected;
+        } else {
+          submittedData[item.label] = item.value || '';
+        }
+      }
+    });
+
+    console.log('✅ Form Submitted Data:', submittedData);
+  }
+
+  trackByIndex(index: number, item: any) {
+    return item?.id ?? index;
+  }
 }

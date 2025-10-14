@@ -8,22 +8,23 @@ export interface FormField {
 }
 
 export interface FormSubSection {
-  title: string;
-  fields: FormField[];
+  subsection?: string;
+  fields?: FormField[];
 }
 
 export interface FormSection {
-  title: string;
-  subsections: FormSubSection[];
+  section?: string;
+  fields?:FormField[];
+  subsections?: FormSubSection[];
 }
 
 export interface FormTemplate {
   id: number;
   title: string;
-  category: string;
   description: string;
-  type?: string;
-  sections: FormSection[];
+  type: string;
+  sections?: FormSection[];
+  fields?:FormField[];
 }
 
 @Component({
@@ -33,66 +34,45 @@ export interface FormTemplate {
   styleUrl: './form-templates.scss'
 })
 export class FormTemplates {
-  constructor(private router: Router, private template: Template) {}
+  constructor(private router: Router, private template: Template,) {}
 
-  // ✅ Full templates list
   templates: FormTemplate[] = [
     {
       id: 1,
       title: 'Employee Onboarding Form',
-      category: 'HR Template',
-      description: 'Collect personal and job-related details of new employees.',
       type: 'single-page',
-      sections: [
-        {
-          title: 'Personal Details',
-          subsections: [
-            {
-              title: 'Basic Info',
+      description: 'Collect personal and job-related details of new employees.',
+      
               fields: [
                 { label: 'Full Name', type: 'text' },
                 { label: 'Email ID', type: 'email' },
                 { label: 'Date of Joining', type: 'date' }
               ]
-            }
-          ]
-        }
-      ]
     },
     {
       id: 2,
       title: 'Address Information',
-      category: 'General Template',
       description: 'Template for permanent and temporary address details.',
       type: 'single-page',
-      sections: [
-        {
-          title: 'Address Details',
-          subsections: [
-            {
-              title: 'Permanent Address',
               fields: [
-                { label: 'Address Line 1', type: 'text' },
+                { label: 'Name', type: 'text'},
+                { label: 'Phone', type: 'number'},
+                { label: 'Address', type: 'text' },
                 { label: 'City', type: 'text' },
                 { label: 'Country', type: 'dropdown' }
               ]
-            }
-          ]
-        }
-      ]
     },
     {
       id: 3,
       title: 'Water Connection Form',
-      category: 'Utility Template',
       description: 'For customers requesting new or reconnection of water service.',
       type: 'multi-page',
       sections: [
         {
-          title: 'Connection Details',
+          section: 'Connection Details',
           subsections: [
             {
-              title: 'Customer Info',
+              subsection: 'Customer Info',
               fields: [
                 { label: 'Applicant Name', type: 'text' },
                 { label: 'Contact Number', type: 'text' },
@@ -100,13 +80,13 @@ export class FormTemplates {
               ]
             },
             {
-              title: 'Address',
+              subsection: 'Current Address',
               fields: [
                 { label: 'House Number', type: 'text' },
                 { label: 'Street', type: 'text' },
                 { label: 'Zone', type: 'dropdown' }
               ]
-            }
+            },
           ]
         }
       ]
@@ -114,15 +94,14 @@ export class FormTemplates {
     {
       id: 4,
       title: 'Exchange Request Form',
-      category: 'Service Template',
       description: 'Used for product exchange or service replacement requests.',
       type: 'multi-page',
       sections: [
         {
-          title: 'Product Information',
+          section: 'Product Information',
           subsections: [
             {
-              title: 'Product Details',
+              subsection: 'Product Details',
               fields: [
                 { label: 'Product Name', type: 'text' },
                 { label: 'Purchase Date', type: 'date' },
@@ -130,7 +109,7 @@ export class FormTemplates {
               ]
             },
             {
-              title: 'Address',
+              subsection: 'Address',
               fields: [
                 { label: 'House Number', type: 'text' },
                 { label: 'Street', type: 'text' },
@@ -142,39 +121,58 @@ export class FormTemplates {
       ]
     },
     {
-      id: 5,
-      title: 'Return Request Form',
-      category: 'E-commerce Template',
-      description: 'Template for processing customer product return requests.',
-      type: 'form-page',
-      sections: [
+  id: 5,
+  title: 'Return Request Form',
+  description: 'Template for processing customer product return requests.',
+  type: 'form-page',
+  sections: [
+    {
+      section: 'Order Details',
+      fields: [
+        { label: 'Order No', type: 'text' },
+        { label: 'Product type', type: 'text' },
+        { label: 'Reason for Return', type: 'textarea' }
+      ],
+      subsections: [
         {
-          title: 'Order Details',
-          subsections: [
-            {
-              title: 'Return Info',
-              fields: [
-                { label: 'Order ID', type: 'text' },
-                { label: 'Product Name', type: 'text' },
-                { label: 'Reason for Return', type: 'textarea' }
-              ]
-            }
+          subsection: 'Return Info',
+          fields: [
+            { label: 'Order ID', type: 'text' },
+            { label: 'Product Name', type: 'text' },
+            { label: 'Reason for Return', type: 'textarea' }
+          ]
+        },
+        {
+          subsection: 'Current Address',
+          fields: [
+            { label: 'House Number', type: 'text' },
+            { label: 'Street', type: 'text' },
+            { label: 'Zone', type: 'dropdown' }
+          ]
+        },
+        {
+          subsection: 'Permanent Address',
+          fields: [
+            { label: 'House Number', type: 'text' },
+            { label: 'Street', type: 'text' },
+            { label: 'Zone', type: 'dropdown' }
           ]
         }
       ]
-    },
+    }
+  ]
+},
     {
       id: 6,
       title: 'New Application Form',
-      category: 'General Template',
       description: 'Used for applying new services, connections, or ID requests.',
       type: 'form-page',
       sections: [
         {
-          title: 'Applicant Details',
+          section: 'Applicant Details',
           subsections: [
             {
-              title: 'Personal Info',
+              subsection: 'Personal Info',
               fields: [
                 { label: 'Applicant Name', type: 'text' },
                 { label: 'Email', type: 'email' },
@@ -187,9 +185,6 @@ export class FormTemplates {
     }
   ];
 
-  // ✅ Filtered arrays (avoids .filter() in HTML)
-  // singlePageTemplates = this.templates.filter(t => t.type === 'single-page');
-  // multiPageTemplates = this.templates.filter(t => t.type === 'multi-page');
 
  openTemplate(templateId: number) {
     const selectedTemplate = this.templates.find(t => t.id === templateId);

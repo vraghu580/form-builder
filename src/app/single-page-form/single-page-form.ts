@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { Template } from '../template';
+
 
 export interface FormField {
   type: string;
@@ -22,6 +25,7 @@ export interface FormStructure {
   title: string;
   description: string;
   fields: FormField[];
+  formType?: string;
 }
 
 @Component({
@@ -31,7 +35,6 @@ export interface FormStructure {
   styleUrl: './single-page-form.scss'
 })
 export class SinglePageForm {
-  // Fields array
   activeFields: any[] = [ ];
   selectedFieldIndex: number | null = null;
 
@@ -40,8 +43,8 @@ export class SinglePageForm {
 
   formTitle: string = 'Form Title';
   formDescription: string = 'Form description goes here';
+  formType: string ='Single Page Form';
 
-  // Track if title or description is selected for editing in properties panel
   selectedFormProperty: 'title' | 'description' | null = null;
 
   fieldTypes: FormField[] = [
@@ -60,6 +63,30 @@ export class SinglePageForm {
     { icon: 'bi-fonts', attributeName: 'Simple Attribute', attributeDiscription: 'Single Value Field' },
     { icon: 'bi-calculator', attributeName: 'Composite Attribute', attributeDiscription: 'Complex structure (address, name)' }
   ];
+
+constructor(private templateService: Template, private router: Router){}
+
+ngOnInit() {
+    const selectedTemplate = this.templateService.getTemplate();
+
+    if (selectedTemplate) {
+      this.formTitle = selectedTemplate.title || 'Form Title';
+      this.formDescription = selectedTemplate.description || 'Form description goes here';
+      // this.formType = selectedTemplate.type || 'unknown';   
+
+      if (selectedTemplate.fields && selectedTemplate.fields.length > 0) {
+        this.activeFields = selectedTemplate.fields.map((field: any) => ({
+          label: field.label,
+          type: field.type,
+          placeholder: field.label,
+          value: '',
+          required: false,
+          options: []
+        }));
+      }
+    }
+  }
+
 
   setTab(tab: 'field-types' | 'attribute') {
     this.selectedTab = tab;
@@ -86,12 +113,12 @@ export class SinglePageForm {
 
   selectField(index: number) {
     this.selectedFieldIndex = index;
-    this.selectedFormProperty = null; // deselect title/description
+    this.selectedFormProperty = null; 
   }
 
   selectFormProperty(property: 'title' | 'description') {
     this.selectedFormProperty = property;
-    this.selectedFieldIndex = null; // deselect fields
+    this.selectedFieldIndex = null; 
   }
 
   previewMode: 'phone' | 'tablet' | 'desktop' = 'desktop';
@@ -129,9 +156,10 @@ export class SinglePageForm {
 
   saveForm() {
     const formStructure: FormStructure = {
+      formType: this.formType,
       title: this.formTitle,
       description: this.formDescription,
-      fields: this.activeFields
+      fields: this.activeFields,
     };
     console.log('💾 Form Structure:', JSON.stringify(formStructure, null, 2));
   }

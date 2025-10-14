@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 
 export interface FormTemplate {
   id: number;
@@ -23,16 +24,28 @@ export interface FormTemplate {
 })
 export class Template {
    private selectedTemplate: any = null;
+  private selectedTemplateSource = new BehaviorSubject<any>(null);
+
+   selectedTemplate$ = this.selectedTemplateSource.asObservable();
+
+  setTemplate(template: any) {
+    this.selectedTemplateSource.next(template);
+  }
+
+  getTemplate() {
+    return this.selectedTemplateSource.getValue();
+  }
+
 
   // Store selected template
-  setTemplate(template: any) {
-    this.selectedTemplate = template;
-  }
+  // setTemplate(template: any) {
+  //   this.selectedTemplate = template;
+  // }
 
-  // Retrieve selected template
-  getTemplate() {
-    return this.selectedTemplate;
-  }
+  // // Retrieve selected template
+  // getTemplate() {
+  //   return this.selectedTemplate;
+  // }
 
   // Optional: clear template
   clearTemplate() {

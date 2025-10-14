@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Template } from '../template';
 
 interface FieldType {
   label: string;
@@ -20,7 +22,7 @@ interface Step {
   standalone: false,
 })
 export class MultiStepForm {
-saveAndResume = false;
+  saveAndResume = false;
 
   fieldTypes: FieldType[] = [
     { label: 'Text', type: 'text', icon: 'bi-type' },
@@ -45,10 +47,41 @@ saveAndResume = false;
   form: FormGroup;
   selectedFieldIndex: number | null = null;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private templateService: Template, private router: Router) {
     this.form = this.fb.group({
       steps: this.fb.array([this.fb.group({})])
     });
+  }
+
+  ngOnInit() {
+    const selectedTemplate = this.templateService.getTemplate();
+
+    if (selectedTemplate) {
+      // this.formTitle = selectedTemplate.title || 'Form Title';
+      // this.formDescription = selectedTemplate.description || 'Form description goes here';
+      // this.formType = selectedTemplate.type || 'unknown';   
+
+      if (selectedTemplate.sections && selectedTemplate.sections.length > 0) {
+        selectedTemplate.sections.forEach((section: any) => {
+          if (section.subsections && section.subsections.length > 0) {
+            section.subsections.forEach((sub: any) => {
+              if (sub.fields && sub.fields.length > 0) {
+                sub.fields.forEach((field: any) => {
+                  this.steps[this.currentStep].fields.push({
+                    label: field.label,
+                    type: field.type,
+                    placeholder: field.label,
+                    value: '',
+                    required: false,
+                  });
+                });
+
+              }
+            });
+          }
+        });
+      }
+    }
   }
 
   get stepsFormArray(): FormArray<FormGroup> {

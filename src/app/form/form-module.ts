@@ -4,13 +4,15 @@ import { FormTemplates } from './form-templates/form-templates';
 import { FormRoutingModule } from './form-routing-module';
 import { FormPage } from './form-page/form-page';
 import { FormsModule } from '@angular/forms';
+import { FormBuilderPage } from './form-builder-page/form-builder-page';
 
 
 
 @NgModule({
   declarations: [
     FormTemplates,
-    FormPage
+    FormPage,
+    FormBuilderPage
   ],
   imports: [
     CommonModule,
