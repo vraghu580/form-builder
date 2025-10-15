@@ -20,7 +20,7 @@
       </button>
       <button
         class="inline-flex items-center justify-center text-sm font-medium border rounded-md gap-1.5 px-3 py-1 bg-black text-white hover:bg-gray-800"
-        (click)="saveForm()">  
+        (click)="saveForm()">
         <i class="bi bi-floppy"></i> Save Form
       </button>
     </div>
@@ -99,8 +99,16 @@
              'max-w-4xl': previewMode==='desktop'
            }">
 
-            <h2 class="text-lg font-semibold text-gray-900 mb-1">Form Title</h2>
-            <p class="text-sm text-gray-500 mb-4">Form description goes here</p>
+            <div class=" p-3 rounded ">
+              <h2 (click)="selectFormProperty('title')" class="text-lg font-semibold text-gray-900 mb-1 cursor-pointer">
+                {{ formTitle }}
+              </h2>
+
+              <p (click)="selectFormProperty('description')" class="text-sm text-gray-500 mb-4 cursor-pointer">
+                {{ formDescription }}
+              </p>
+
+            </div>
 
             <div class="space-y-4" *ngIf="activeFields.length === 0">
               <div class="text-center py-12 text-gray-500">
@@ -252,15 +260,26 @@
         <ng-template #noField>
           <p class="text-gray-500 text-sm mt-4">Select a field to edit its properties</p>
 
-          <div class="mt-5">
-            <label for="" class="text-sm font-medium text-gray-900">Form title</label>
-            <input type="text" class="w-full border rounded-md px-3 py-2 text-sm placeholder:text-gray-900"
-              placeholder="Form Title">
-          </div>
-          <div class="mt-5">
-            <label for="" class="text-sm font-medium text-gray-900">Description</label>
-            <textarea name="" class="w-full border rounded-md px-3 py-2 text-sm placeholder:text-gray-900"
-              placeholder="Enter form description"></textarea>
+          <div class="bg-gray-50 p-4 border rounded w-72">
+            <ng-container *ngIf="selectedFormProperty === 'title'">
+              <label class="text-sm font-medium mb-1 block">Form Title</label>
+              <input type="text" [(ngModel)]="formTitle" class="w-full border rounded px-2 py-1" />
+            </ng-container>
+
+            <ng-container *ngIf="selectedFormProperty === 'description'">
+              <label class="text-sm font-medium mb-1 block">Form Description</label>
+              <textarea [(ngModel)]="formDescription" class="w-full border rounded px-2 py-1"></textarea>
+            </ng-container>
+
+            <ng-container *ngIf="selectedFieldIndex !== null">
+              <label class="text-sm font-medium mb-1 block">Field Label</label>
+              <input type="text" [(ngModel)]="activeFields[selectedFieldIndex].label"
+                class="w-full border rounded px-2 py-1" />
+
+              <label class="text-sm font-medium mt-2 mb-1 block">Placeholder</label>
+              <input type="text" [(ngModel)]="activeFields[selectedFieldIndex].placeholder"
+                class="w-full border rounded px-2 py-1" />
+            </ng-container>
           </div>
 
           <div class="flex items-center justify-between mt-5">

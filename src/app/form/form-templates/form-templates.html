@@ -1,0 +1,79 @@
+<div class="min-h-screen bg-gray-50 p-8">
+  <div class="max-w-7xl mx-auto">
+
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-3xl font-semibold text-gray-800">📋 Choose a Form Template</h2>
+      <button (click)="exit()" class="text-gray-500 hover:text-red-600 text-2xl">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div *ngFor="let tmpl of templates"
+        class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 hover:border-blue-400">
+
+        <!-- Template Header -->
+        <div class="flex justify-between items-start mb-4">
+          <h3 class="text-lg font-semibold text-gray-800">{{ tmpl.title }}</h3>
+          <span class="text-xs rounded-full px-2 py-0.5" [ngClass]="[
+          tmpl.type === 'single-page' ? 'bg-blue-500 text-white' : '',
+          tmpl.type === 'multi-page' ? 'bg-green-500 text-white' : '',
+          tmpl.type === 'form-page' ? 'bg-black text-white' : ''
+        ]">
+            {{ tmpl.type }}
+          </span>
+        </div>
+
+        <!-- Description -->
+        <p class="text-sm text-gray-500 mb-4">{{ tmpl.description }}</p>
+
+        <!-- ✅ Show Direct Fields (for single-page templates like ID 1) -->
+        <div *ngIf="tmpl.fields && tmpl.fields.length > 0" class="space-y-2 mb-2">
+          <ul class="list-disc list-inside text-gray-500 text-sm ml-2">
+            <li *ngFor="let f of tmpl.fields">
+              {{ f.label }} <span class="text-xs text-gray-400">({{ f.type }})</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- ✅ Show Sectioned Fields (for templates that have sections/subsections) -->
+        <div *ngIf="tmpl.sections && tmpl.sections.length > 0" class="space-y-2">
+          <div *ngFor="let section of tmpl.sections" class="border rounded-md p-2 bg-gray-50">
+            <!-- Section title -->
+            <p class="font-medium text-gray-700">{{ section.section }}</p>
+
+            <!-- Section-level fields -->
+            <ul *ngIf="section.fields && section.fields.length > 0"
+              class="list-disc list-inside text-gray-500 text-sm ml-2">
+              <li *ngFor="let field of section.fields">
+                {{ field.label }} <span class="text-xs text-gray-400">({{ field.type }})</span>
+              </li>
+            </ul>
+
+            <!-- Subsections -->
+            <div *ngIf="section.subsections && section.subsections.length > 0" class="ml-3 mt-2 space-y-1">
+              <div *ngFor="let sub of section.subsections" class="border-l-2 border-gray-200 pl-2">
+                <p class="text-gray-600 text-sm font-medium">{{ sub.subsection }}</p>
+                <ul *ngIf="sub.fields && sub.fields.length > 0"
+                  class="list-disc list-inside text-gray-500 text-sm ml-2">
+                  <li *ngFor="let f of sub.fields">
+                    {{ f.label }} <span class="text-xs text-gray-400">({{ f.type }})</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Choose Button -->
+        <div class="mt-5">
+          <button (click)="openTemplate(tmpl.id)"
+            class="w-full bg-black text-white text-sm rounded-lg py-2 hover:bg-gray-800 transition">
+            Choose Template
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

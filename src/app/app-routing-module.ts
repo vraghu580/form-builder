@@ -7,8 +7,13 @@ import { Home } from './home/home';
 const routes: Routes = [
   {path : 'home', component: Home},
   {path : '', redirectTo: 'home', pathMatch: 'full' },
-  {path : 'single-form', component: SinglePageForm},
-  {path : 'multi-form', component: MultiStepForm }
+  {path : 'single-form/:id', component: SinglePageForm},
+  {path : 'multi-form/:id', component: MultiStepForm },
+  {
+    path: 'form',
+    loadChildren: () =>
+      import('./form/form-module').then(m => m.FormModule),
+  }
 ];
 
 @NgModule({

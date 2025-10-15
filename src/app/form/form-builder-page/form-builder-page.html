@@ -1,0 +1,220 @@
+<div class="h-min flex flex-col bg-gray-50 max-w-7xl mx-auto">
+    <!-- Header -->
+    <div
+        class="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div (click)="backToTemplates()" class="flex gap-2 text-gray-600 hover:text-gray-900 cursor-pointer">
+            <i class="bi bi-arrow-left text-black"></i>
+            <span class="text-sm font-medium">Back to Forms</span>
+        </div>
+
+        <div class="flex flex-col mr-20 md:text-left">
+            <h1 class="text-lg font-semibold text-gray-900">{{ selectedTemplate?.title }}</h1>
+            <p class="text-sm text-gray-500">{{ selectedTemplate?.description }}</p>
+        </div>
+
+        <div class="flex gap-2 justify-center md:justify-end">
+            <button
+                class="inline-flex items-center justify-center text-sm font-medium border rounded-md gap-1.5 px-3 py-1 hover:bg-gray-100">
+                <i class="bi bi-eye"></i> Preview
+            </button>
+            <button
+                class="inline-flex items-center justify-center text-sm font-medium border rounded-md gap-1.5 px-3 py-1 bg-black text-white hover:bg-gray-800">
+                <i class="bi bi-floppy"></i> Save Form
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex flex-1 overflow-hidden flex-col md:flex-row">
+        <!-- Sidebar -->
+        <div class="w-full md:w-72 bg-white border-r border-gray-200 flex flex-col">
+            <div class="flex p-1 gap-2 bg-gray-100 rounded-xl m-4">
+                <button class="flex-1 border rounded-lg px-3 py-1 text-sm font-medium"
+                    [class.bg-white]="selectedTab === 'field-types'" (click)="setTab('field-types')">Attribute</button>
+                <button class="flex-1 border rounded-lg px-3 py-1 text-sm font-medium"
+                    [class.bg-white]="selectedTab === 'attribute'" (click)="setTab('attribute')">Sections</button>
+            </div>
+
+            <!-- Sections/Attributes actions -->
+            <div *ngIf="selectedTab === 'attribute'" class="space-y-3 p-4">
+                <div class="flex items-center gap-3 p-3 rounded-md border shadow-sm hover:shadow-md cursor-pointer"
+                    (click)="addSection()">
+                    <i class="bi bi-fonts text-xl text-blue-700"></i>
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-900">Add Section</h4>
+                        <p class="text-xs text-gray-500">Create a new section</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 p-3 rounded-md border shadow-sm hover:shadow-md cursor-pointer"
+                    (click)="addSubsection()">
+                    <i class="bi bi-calculator text-xl text-blue-700"></i>
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-900">Add Sub Section</h4>
+                        <p class="text-xs text-gray-500">Under selected section</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4">
+                <div *ngIf="selectedTab === 'field-types'">
+                    <h3 class="text-sm font-medium text-gray-700 mb-3">Basic</h3>
+                    <div class="space-y-2">
+                        <div *ngFor="let field of fieldTypes" (click)="addField(field)"
+                            class="flex items-center gap-3 p-3 rounded-md border border-gray-200 hover:border-blue-400 hover:bg-blue-50 cursor-pointer">
+                            <i class="bi {{ field.icon }} text-lg"></i>
+                            <span class="text-sm font-medium">{{ field.name }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Canvas -->
+        <div class="flex-1 p-4">
+            <h3 class="text-sm font-medium text-gray-700 mb-3">Form Builder</h3>
+
+            <div *ngIf="selectedTemplate">
+                <div *ngFor="let section of selectedTemplate.sections"
+                    class="mb-6 border rounded-lg bg-white p-4 relative group"
+                    [class.ring-2]="selectedSection?.id === section.id && !selectedSubsection && !selectedField"
+                    [class.ring-blue-500]="selectedSection?.id === section.id && !selectedSubsection && !selectedField">
+
+                    <!-- Delete icon for Section -->
+                    <button
+                        class="absolute top-2 right-2 text-gray-500 hover:text-red-600 hidden group-hover:inline-flex"
+                        (click)="deleteSection(section.id); $event.stopPropagation()" aria-label="Delete section"
+                        title="Delete section">
+                        <i class="bi bi-trash text-base"></i>
+                    </button>
+
+                    <h3 class="text-md font-semibold text-blue-700 cursor-pointer" (click)="selectSection(section)">
+                        {{ section.title }}
+                    </h3>
+
+                    <!-- Section Fields -->
+                    <div *ngIf="section.fields.length > 0" class="mt-2 space-y-3 pl-3">
+                        <div *ngFor="let f of section.fields" class="border rounded-md p-3 bg-gray-50"
+                            [class.ring-2]="selectedField?.id === f.id"
+                            [class.ring-green-500]="selectedField?.id === f.id"
+                            (click)="selectField(f, section); $event.stopPropagation()">
+                            <div class="flex justify-between">
+                                <label class="font-medium text-sm">{{ f.label }}</label>
+                                <button class="text-xs text-red-600"
+                                    (click)="removeField(section, f.id); $event.stopPropagation()">
+                                    <i class="bi bi-trash text-base"></i>
+                                </button>
+                            </div>
+                            <ng-container [ngSwitch]="f.type">
+                                <input *ngSwitchCase="'text'" type="text" class="w-full border rounded px-3 py-2 mt-2"
+                                    [placeholder]="f.placeholder" />
+                                <textarea *ngSwitchCase="'textarea'"
+                                    class="w-full border rounded px-3 py-2 mt-2"></textarea>
+                                <input *ngSwitchDefault type="text" class="w-full border rounded px-3 py-2 mt-2" />
+                            </ng-container>
+                        </div>
+                    </div>
+
+
+                    <!-- Subsections -->
+                    <div *ngFor="let sub of section.subsections"
+                        class="ml-6 mt-4 border-l-2 border-blue-200 pl-3 relative group"
+                        [class.ring-2]="selectedSubsection?.id === sub.id && !selectedField"
+                        [class.ring-purple-500]="selectedSubsection?.id === sub.id && !selectedField">
+
+                        <!-- Delete icon for Sub Section -->
+                        <button
+                            class="absolute top-0 right-0 translate-x-2 -translate-y-2 text-gray-500 hover:text-red-600 hidden group-hover:inline-flex"
+                            (click)="deleteSubsection(section.id, sub.id); $event.stopPropagation()"
+                            aria-label="Delete sub section" title="Delete sub section">
+                            <i class="bi bi-trash text-base"></i>
+                        </button>
+
+                        <h4 class="text-sm font-semibold text-gray-700 cursor-pointer"
+                            (click)="selectSubsection(sub, section)">
+                            ➤ {{ sub.title }}
+                        </h4>
+
+                        <!-- Subsection Fields -->
+                        <div *ngIf="sub.fields.length > 0" class="mt-2 space-y-3 pl-3">
+                            <div *ngFor="let f of sub.fields" class="border rounded-md p-3 bg-gray-50"
+                                [class.ring-2]="selectedField?.id === f.id"
+                                [class.ring-green-500]="selectedField?.id === f.id"
+                                (click)="selectField(f, section, sub); $event.stopPropagation()">
+                                <div class="flex justify-between">
+                                    <label class="font-medium text-sm">{{ f.label }}</label>
+                                    <button class="text-xs text-red-600"
+                                        (click)="removeField(sub, f.id); $event.stopPropagation()">
+                                        <i class="bi bi-trash text-base"></i>
+                                    </button>
+                                </div>
+                                <ng-container [ngSwitch]="f.type">
+                                    <input *ngSwitchCase="'text'" type="text"
+                                        class="w-full border rounded px-3 py-2 mt-2" [placeholder]="f.placeholder" />
+                                    <textarea *ngSwitchCase="'textarea'"
+                                        class="w-full border rounded px-3 py-2 mt-2"></textarea>
+                                    <input *ngSwitchDefault type="text" class="w-full border rounded px-3 py-2 mt-2" />
+                                </ng-container>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <button type="submit"
+                class="w-full bg-black text-white rounded-md py-2 text-sm font-medium hover:bg-gray-800">
+                Submit Form
+            </button>
+
+            <div *ngIf="!selectedTemplate" class="text-gray-500 text-center mt-10">
+                No template selected.
+            </div>
+        </div>
+
+        <!-- Properties Panel -->
+        <div class="w-full md:w-80 border-l border-gray-200 bg-white p-4">
+            <h3 class="text-sm font-medium text-gray-700 mb-3">Properties</h3>
+
+            <!-- Section properties -->
+            <div *ngIf="activeNodeType === 'section' && selectedSection" class="space-y-3">
+                <label class="block text-xs text-gray-600">Section Name</label>
+                <input class="w-full border rounded px-3 py-2" [ngModel]="selectedSection.title"
+                    (ngModelChange)="updateSectionTitle($event)" />
+            </div>
+
+            <!-- Subsection properties -->
+            <div *ngIf="activeNodeType === 'subsection' && selectedSubsection" class="space-y-3">
+                <label class="block text-xs text-gray-600">Sub Section Name</label>
+                <input class="w-full border rounded px-3 py-2" [ngModel]="selectedSubsection.title"
+                    (ngModelChange)="updateSubTitle($event)" />
+            </div>
+
+            <!-- Field properties -->
+            <div *ngIf="activeNodeType === 'field' && selectedField" class="space-y-3">
+                <div>
+                    <label class="block text-xs text-gray-600">Label</label>
+                    <input class="w-full border rounded px-3 py-2" [ngModel]="selectedField.label"
+                        (ngModelChange)="updateFieldLabel($event)" />
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-600">Placeholder</label>
+                    <input class="w-full border rounded px-3 py-2" [ngModel]="selectedField.placeholder"
+                        (ngModelChange)="updateFieldPlaceholder($event)" />
+                </div>
+                <div
+                    *ngIf="selectedField.type === 'dropdown' || selectedField.type === 'checkbox' || selectedField.type === 'radio'">
+                    <label class="block text-xs text-gray-600">Options (comma separated)</label>
+                    <input class="w-full border rounded px-3 py-2" [ngModel]="getOptionsCSV()"
+                        (ngModelChange)="updateOptionsCSV($event)" />
+                </div>
+                <div>
+                    <span class="text-xs text-gray-500">Type: {{ selectedField.type }}</span>
+                </div>
+            </div>
+
+            <div *ngIf="!activeNodeType" class="text-xs text-gray-500">
+                Select a Section, Sub Section, or Field to edit properties.
+            </div>
+        </div>
+    </div>
+</div>
