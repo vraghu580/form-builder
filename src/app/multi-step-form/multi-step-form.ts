@@ -23,6 +23,7 @@ interface Step {
 })
 export class MultiStepForm {
   saveAndResume = false;
+  activeFields: any[] = [];
 
   fieldTypes: FieldType[] = [
     { label: 'Text', type: 'text', icon: 'bi-type' },
@@ -36,6 +37,10 @@ export class MultiStepForm {
     { label: 'Textarea', type: 'textarea', icon: 'bi-card-text' },
     { label: 'File Upload', type: 'file', icon: 'bi-upload' }
   ];
+
+  formTitle: string = 'Form Title';
+  formDescription: string = 'Form description goes here';
+  formType: string ='Single Page Form';
 
   activeTab: 'fields' | 'steps' = 'fields';
   steps: Step[] = [
@@ -83,6 +88,31 @@ export class MultiStepForm {
       }
     }
   }
+saveForm() {
+  // Collect current values for each step from the reactive FormArray
+  const stepsValues = this.stepsFormArray.controls.map((grp) => grp.value);
+
+  const formStructure = {
+    title: this.formTitle,
+    description: this.formDescription,
+    type: this.formType,
+    steps: this.steps.map((step, si) => ({
+      title: step.title,
+      description: step.description,
+      fields: step.fields.map((f) => ({
+        label: f.label,
+        type: f.type,
+        placeholder: f.placeholder ?? '',
+        required: !!f.required,
+        value: stepsValues[si]?.[f.label] ?? null
+      }))
+    }))
+  };
+
+  console.log('💾 Form Structure:', JSON.stringify(formStructure, null, 2));
+  // TODO: send to API if needed
+}
+
 
   get stepsFormArray(): FormArray<FormGroup> {
     return this.form.get('steps') as FormArray<FormGroup>;

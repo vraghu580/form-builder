@@ -8,7 +8,9 @@ import { MultiStepForm } from './multi-step-form/multi-step-form';
 import { CommonModule } from '@angular/common';
 import { Home } from './home/home';
 import { SinglePageForm } from './single-page-form/single-page-form';
-
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { TemplatePreviewDialog } from './dialogs/template-preview-dialog/template-preview-dialog';
 
 
 
@@ -18,6 +20,7 @@ import { SinglePageForm } from './single-page-form/single-page-form';
     MultiStepForm,
     Home,
     SinglePageForm,
+    TemplatePreviewDialog,
   ],
 
 
@@ -27,6 +30,9 @@ import { SinglePageForm } from './single-page-form/single-page-form';
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
+    MatDialogModule,
+    MatButtonModule,
+    BrowserModule
 
   ],
   providers: [
