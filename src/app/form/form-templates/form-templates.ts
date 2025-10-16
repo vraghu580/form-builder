@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { Template } from '../../template';
 import { MatDialog } from '@angular/material/dialog';
 import { TemplatePreviewDialog } from '../../dialogs/template-preview-dialog/template-preview-dialog';
+import { Template } from '../../services/template';
 
 export interface FormField {
   label: string;
@@ -45,6 +45,7 @@ export class FormTemplates {
       title: 'Employee Onboarding Form',
       type: 'single-page',
       description: 'Collect personal and job-related details of new employees.',
+
       fields: [
         { label: 'Full Name', type: 'text' },
         { label: 'Email ID', type: 'email' },

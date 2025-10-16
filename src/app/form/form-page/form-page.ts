@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { Template } from '../../template';
+import { Template } from '../../services/template';
 
 export interface FormField {
   id?: string;

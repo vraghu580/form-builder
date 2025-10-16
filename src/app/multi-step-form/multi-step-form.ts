@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Template } from '../template';
+import { Template } from '../services/template';
 
 interface FieldType {
   label: string;
