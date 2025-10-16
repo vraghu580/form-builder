@@ -5,13 +5,15 @@ import { ConnectorForm } from './connector-form/connector-form';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
 import { GetConnectorType } from './get-connector-type/get-connector-type';
+import { EditConnectorType } from './edit-connector-type/edit-connector-type';
 
 
 
 @NgModule({
   declarations: [
   ConnectorForm,
-  GetConnectorType
+  GetConnectorType,
+  EditConnectorType
   ],
   imports: [
     CommonModule,

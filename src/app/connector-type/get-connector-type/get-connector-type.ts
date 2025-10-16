@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { connectionTypeService } from '../../services/connection-type-service';
 
-// ✅ Define the interface for connector type
 export interface ConnectorType {
   id: string;
   name: string;
@@ -29,11 +28,9 @@ export class GetConnectorType implements OnInit {
   loading = false;
   error = '';
 
-  // For modal view
   selectedConnector: ConnectorType | null = null;
   isViewing = false;
 
-  // Track deleting state per item id
   deletingMap: Record<string, boolean> = {};
 
   constructor(
@@ -45,7 +42,6 @@ export class GetConnectorType implements OnInit {
     this.loadList();
   }
 
-  /** 🔹 Load all connector types */
   loadList() {
     this.loading = true;
     this.error = '';
@@ -63,21 +59,19 @@ export class GetConnectorType implements OnInit {
       });
   }
 
-  /** 🔹 Navigate to create page */
   onCreate() {
-    this.router.navigate(['/connector-types/create']);
+    this.router.navigate(['/connector-type/connector-form']);
   }
 
-  /** 🔹 Navigate to edit page */
   onEdit(conn: ConnectorType) {
     if (!conn?.id) {
       alert('No ID available for editing');
       return;
     }
-    this.router.navigate(['/connector-types', conn.id, 'edit']);
+    this.router.navigate(['/connector-type/Connector-edit', conn]);
   }
 
-  /** 🔹 View details in modal */
+
   onView(conn: ConnectorType) {
     this.selectedConnector = conn;
     this.isViewing = true;
@@ -88,7 +82,6 @@ export class GetConnectorType implements OnInit {
     this.selectedConnector = null;
   }
 
-  /** 🔹 Delete connector */
   onDelete(conn: ConnectorType) {
     if (!conn?.id) return;
     const confirmed = confirm(`Delete connector "${conn.displayName || conn.name}"?`);
@@ -100,7 +93,6 @@ export class GetConnectorType implements OnInit {
       .pipe(finalize(() => { this.deletingMap[conn.id] = false; }))
       .subscribe({
         next: () => {
-          // remove deleted record from list instantly
           this.connectors = this.connectors.filter(c => c.id !== conn.id);
         },
         error: (err) => {
@@ -110,7 +102,6 @@ export class GetConnectorType implements OnInit {
       });
   }
 
-  /** 🔹 Display metadata summary */
   metadataSummary(conn: ConnectorType): string {
     const count = conn.metadataSchema?.length || 0;
     return count ? `${count} field${count > 1 ? 's' : ''}` : 'No metadata';

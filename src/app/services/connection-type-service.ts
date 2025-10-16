@@ -24,4 +24,13 @@ export class connectionTypeService {
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  update(id: string, body: any) {
+  return this.http.put(`${this.baseUrl}/${id}`, body);
+}
+
+/** 🔹 Get a connector type by ID (optional if you want to prefill form) */
+getById(id: string) {
+  return this.http.get<ConnectorType>(`${this.baseUrl}/${id}`);
+}
 }
