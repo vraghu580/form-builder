@@ -8,6 +8,8 @@ import { MultiStepForm } from './multi-step-form/multi-step-form';
 import { CommonModule } from '@angular/common';
 import { Home } from './home/home';
 import { SinglePageForm } from './single-page-form/single-page-form';
+import { ConnectorForm } from './connector-form/connector-form';
+import { HttpClientModule, provideHttpClient } from '@angular/common/http';
 
 
 
@@ -18,6 +20,7 @@ import { SinglePageForm } from './single-page-form/single-page-form';
     MultiStepForm,
     Home,
     SinglePageForm,
+    ConnectorForm,
   ],
 
 
@@ -32,7 +35,8 @@ import { SinglePageForm } from './single-page-form/single-page-form';
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideClientHydration(withEventReplay())
+    provideClientHydration(withEventReplay()),
+    provideHttpClient(),
   ],
   bootstrap: [App]
 })

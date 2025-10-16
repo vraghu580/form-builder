@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { Template } from '../template';
+import { Template } from '../services/template';
 
 
 export interface FormField {
@@ -35,7 +35,7 @@ export interface FormStructure {
   styleUrl: './single-page-form.scss'
 })
 export class SinglePageForm {
-  activeFields: any[] = [ ];
+  activeFields: any[] = [];
   selectedFieldIndex: number | null = null;
 
   isValidationEnabled = false;
@@ -43,7 +43,7 @@ export class SinglePageForm {
 
   formTitle: string = 'Form Title';
   formDescription: string = 'Form description goes here';
-  formType: string ='Single Page Form';
+  formType: string = 'Single Page Form';
 
   selectedFormProperty: 'title' | 'description' | null = null;
 
@@ -64,9 +64,9 @@ export class SinglePageForm {
     { icon: 'bi-calculator', attributeName: 'Composite Attribute', attributeDiscription: 'Complex structure (address, name)' }
   ];
 
-constructor(private templateService: Template, private router: Router){}
+  constructor(private templateService: Template, private router: Router) { }
 
-ngOnInit() {
+  ngOnInit() {
     const selectedTemplate = this.templateService.getTemplate();
 
     if (selectedTemplate) {
@@ -113,12 +113,12 @@ ngOnInit() {
 
   selectField(index: number) {
     this.selectedFieldIndex = index;
-    this.selectedFormProperty = null; 
+    this.selectedFormProperty = null;
   }
 
   selectFormProperty(property: 'title' | 'description') {
     this.selectedFormProperty = property;
-    this.selectedFieldIndex = null; 
+    this.selectedFieldIndex = null;
   }
 
   previewMode: 'phone' | 'tablet' | 'desktop' = 'desktop';

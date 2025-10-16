@@ -1,0 +1,78 @@
+<div class="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow-md">
+  <h2 class="text-2xl font-semibold mb-4 text-gray-700">Create Connection Type</h2>
+
+  <form [formGroup]="connectionForm" (ngSubmit)="onSubmit()" class="space-y-4">
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block font-medium text-gray-600">Name</label>
+        <input type="text" formControlName="name" class="border rounded w-full p-2" />
+      </div>
+
+      <div>
+        <label class="block font-medium text-gray-600">Display Name</label>
+        <input type="text" formControlName="displayName" class="border rounded w-full p-2" />
+      </div>
+
+      <div>
+        <label class="block font-medium text-gray-600">Category</label>
+        <input type="text" formControlName="category" class="border rounded w-full p-2" />
+      </div>
+
+      <div>
+        <label class="block font-medium text-gray-600">Connector Type</label>
+        <input type="text" formControlName="connector_type" class="border rounded w-full p-2" />
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <h3 class="text-lg font-semibold mb-2 text-gray-700">Metadata Schema</h3>
+      <div formArrayName="metadataSchema">
+        <div *ngFor="let field of metadataSchema.controls; let i = index" [formGroupName]="i"
+             class="border rounded p-4 mb-3 bg-gray-50 relative">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-gray-600">Key</label>
+              <input formControlName="key" class="border rounded w-full p-2" />
+            </div>
+            <div>
+              <label class="block text-gray-600">Label</label>
+              <input formControlName="label" class="border rounded w-full p-2" />
+            </div>
+
+            <div>
+              <label class="block text-gray-600">Required</label>
+              <input type="checkbox" formControlName="required" class="mt-2" />
+            </div>
+            <div>
+              <label class="block text-gray-600">Type</label>
+              <select formControlName="type" class="border rounded w-full p-2">
+                <option value="">Select Type</option>
+                <option value="string">String</option>
+                <option value="number">Number</option>
+                <option value="boolean">Boolean</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="button"
+                  (click)="removeMetadataField(i)"
+                  class="absolute top-2 right-2 text-red-600 hover:text-red-800">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <button type="button"
+              (click)="addMetadataField()"
+              class="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+        + Add Metadata Field
+      </button>
+    </div>
+
+    <div class="mt-6">
+      <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
+        Save Connection
+      </button>
+    </div>
+  </form>
+</div>

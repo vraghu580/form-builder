@@ -36,18 +36,6 @@ export class Template {
     return this.selectedTemplateSource.getValue();
   }
 
-
-  // Store selected template
-  // setTemplate(template: any) {
-  //   this.selectedTemplate = template;
-  // }
-
-  // // Retrieve selected template
-  // getTemplate() {
-  //   return this.selectedTemplate;
-  // }
-
-  // Optional: clear template
   clearTemplate() {
     this.selectedTemplate = null;
   }

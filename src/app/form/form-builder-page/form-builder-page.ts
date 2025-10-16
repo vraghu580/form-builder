@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Template } from '../../template';
+import { Template } from '../../services/template';
 
 type FieldType =
   | 'text'
@@ -68,7 +68,7 @@ export class FormBuilderPage implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private templateService: Template
-  ) {}
+  ) { }
 
   setTab(tab: 'field-types' | 'attribute') {
     this.selectedTab = tab;
@@ -93,7 +93,7 @@ export class FormBuilderPage implements OnInit {
     }
   }
 
-  
+
   backToTemplates() {
     this.router.navigate(['/form', 'form-temp']);
   }
@@ -121,31 +121,31 @@ export class FormBuilderPage implements OnInit {
     this.activeNodeType = 'field';
   }
 
-addSection() {
-  if (!this.selectedTemplate) return;
-  const newSection = {
-    id: crypto.randomUUID?.() ?? Math.random().toString(36).slice(2),
-    title: 'New Section',
-    fields: [] as BuilderField[],
-    subsections: [] as any[],
-  };
-  this.selectedTemplate.sections.push(newSection);
-  this.selectSection(newSection);
-}
-
-addSubsection() {
-  if (!this.selectedSection) {
-    alert('Select a Section first to add a Sub Section.');
-    return;
+  addSection() {
+    if (!this.selectedTemplate) return;
+    const newSection = {
+      id: crypto.randomUUID?.() ?? Math.random().toString(36).slice(2),
+      title: 'New Section',
+      fields: [] as BuilderField[],
+      subsections: [] as any[],
+    };
+    this.selectedTemplate.sections.push(newSection);
+    this.selectSection(newSection);
   }
-  const newSub = {
-    id: crypto.randomUUID?.() ?? Math.random().toString(36).slice(2),
-    title: 'New Sub Section',
-    fields: [] as BuilderField[],
-  };
-  this.selectedSection.subsections.push(newSub);
-  this.selectSubsection(newSub, this.selectedSection);
-}
+
+  addSubsection() {
+    if (!this.selectedSection) {
+      alert('Select a Section first to add a Sub Section.');
+      return;
+    }
+    const newSub = {
+      id: crypto.randomUUID?.() ?? Math.random().toString(36).slice(2),
+      title: 'New Sub Section',
+      fields: [] as BuilderField[],
+    };
+    this.selectedSection.subsections.push(newSub);
+    this.selectSubsection(newSub, this.selectedSection);
+  }
 
 
   addField(field: any) {
@@ -171,15 +171,15 @@ addSubsection() {
     }
   }
 
-removeField(container: { fields: BuilderField[] }, fieldId: string, ev?: MouseEvent) {
-  if (ev) ev.stopPropagation();
-  container.fields = (container.fields || []).filter(f => f.id !== fieldId);
+  removeField(container: { fields: BuilderField[] }, fieldId: string, ev?: MouseEvent) {
+    if (ev) ev.stopPropagation();
+    container.fields = (container.fields || []).filter(f => f.id !== fieldId);
 
-  if (this.selectedField?.id === fieldId) {
-    this.selectedField = null;
-    this.activeNodeType = this.selectedSubsection ? 'subsection' : 'section';
+    if (this.selectedField?.id === fieldId) {
+      this.selectedField = null;
+      this.activeNodeType = this.selectedSubsection ? 'subsection' : 'section';
+    }
   }
-}
 
   updateSectionTitle(val: string) {
     if (this.selectedSection) this.selectedSection.title = val;
@@ -210,37 +210,37 @@ removeField(container: { fields: BuilderField[] }, fieldId: string, ev?: MouseEv
     return (this.selectedField?.options || []).join(', ');
   }
 
-deleteSection(sectionId: string) {
-  if (!this.selectedTemplate?.sections) return;
-  const idx = this.selectedTemplate.sections.findIndex((s: any) => s.id === sectionId);
-  if (idx > -1) {
-    const deletingSelectedSection =
-      this.selectedSection && this.selectedSection.id === sectionId;
-    if (deletingSelectedSection) {
-      this.selectedSection = null;
-      this.selectedSubsection = null;
-      this.selectedField = null;
-      this.activeNodeType = null;
+  deleteSection(sectionId: string) {
+    if (!this.selectedTemplate?.sections) return;
+    const idx = this.selectedTemplate.sections.findIndex((s: any) => s.id === sectionId);
+    if (idx > -1) {
+      const deletingSelectedSection =
+        this.selectedSection && this.selectedSection.id === sectionId;
+      if (deletingSelectedSection) {
+        this.selectedSection = null;
+        this.selectedSubsection = null;
+        this.selectedField = null;
+        this.activeNodeType = null;
+      }
+      this.selectedTemplate.sections.splice(idx, 1);
     }
-    this.selectedTemplate.sections.splice(idx, 1);
   }
-}
 
-deleteSubsection(parentSectionId: string, subId: string) {
-  const parent = this.selectedTemplate?.sections?.find((s: any) => s.id === parentSectionId);
-  if (!parent) return;
-  const idx = parent.subsections.findIndex((sub: any) => sub.id === subId);
-  if (idx > -1) {
-    const deletingSelectedSub =
-      this.selectedSubsection && this.selectedSubsection.id === subId;
-    if (deletingSelectedSub) {
-      this.selectedSubsection = null;
-      this.selectedField = null;
-      this.activeNodeType = this.selectedSection ? 'section' : null;
+  deleteSubsection(parentSectionId: string, subId: string) {
+    const parent = this.selectedTemplate?.sections?.find((s: any) => s.id === parentSectionId);
+    if (!parent) return;
+    const idx = parent.subsections.findIndex((sub: any) => sub.id === subId);
+    if (idx > -1) {
+      const deletingSelectedSub =
+        this.selectedSubsection && this.selectedSubsection.id === subId;
+      if (deletingSelectedSub) {
+        this.selectedSubsection = null;
+        this.selectedField = null;
+        this.activeNodeType = this.selectedSection ? 'section' : null;
+      }
+      parent.subsections.splice(idx, 1);
     }
-    parent.subsections.splice(idx, 1);
   }
-}
 
 }
 
