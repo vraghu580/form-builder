@@ -1,5 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { ConnectorType } from '../connector-type/get-connector-type/get-connector-type';
 
 @Injectable({
   providedIn: 'root'
@@ -14,4 +16,12 @@ export class connectionTypeService {
     return this.http.post(this.baseUrl, body)
   }
    
+  getAll(): Observable<ConnectorType[]> {
+    return this.http.get<ConnectorType[]>(this.baseUrl);
+  }
+
+  /** 🔹 Delete a connector type by ID */
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
 }

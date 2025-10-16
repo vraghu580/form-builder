@@ -1,21 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { connectionTypeService } from '../services/connection-type-service';
+import { connectionTypeService } from '../../services/connection-type-service';
 
-export interface MetadataSchema {
-  connection_string: string;
-  username: string;
-  password: string;
-  port: number;
-}
+// export interface MetadataSchema {
+//   connection_string: string;
+//   username: string;
+//   password: string;
+//   port: number;
+// }
 
-export interface ConnectorFormModel {
-  category: string;
-  name: string;
-  connector_type: string;
-  metadata_schema: MetadataSchema;
-  image?: string; // optional
-}
+// export interface ConnectorFormModel {
+//   category: string;
+//   name: string;
+//   connector_type: string;
+//   metadata_schema: MetadataSchema;
+//   image?: string; // optional
+// }
 
 @Component({
   selector: 'app-connector-form',
@@ -23,8 +23,8 @@ export interface ConnectorFormModel {
   templateUrl: './connector-form.html',
   styleUrls: ['./connector-form.scss']
 })
-export class ConnectorForm  {
- connectionForm: FormGroup;
+export class ConnectorForm {
+  connectionForm: FormGroup;
 
   constructor(private fb: FormBuilder, private connectionTypeService: connectionTypeService) {
     this.connectionForm = this.fb.group({
@@ -62,9 +62,9 @@ export class ConnectorForm  {
   onSubmit() {
     if (this.connectionForm.valid) {
       console.log('Final Request Body:', this.connectionForm.value);
-    this.connectionTypeService.createConnectionType(this.connectionForm.value).subscribe((res)=>{
-      console.log('Response' , res);
-    })
+      this.connectionTypeService.createConnectionType(this.connectionForm.value).subscribe((res) => {
+        console.log('Response', res);
+      })
     } else {
       alert('Please fill all required fields')
     }

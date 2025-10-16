@@ -8,7 +8,6 @@ import { MultiStepForm } from './multi-step-form/multi-step-form';
 import { CommonModule } from '@angular/common';
 import { Home } from './home/home';
 import { SinglePageForm } from './single-page-form/single-page-form';
-import { ConnectorForm } from './connector-form/connector-form';
 import { HttpClientModule, provideHttpClient } from '@angular/common/http';
 
 
@@ -20,7 +19,7 @@ import { HttpClientModule, provideHttpClient } from '@angular/common/http';
     MultiStepForm,
     Home,
     SinglePageForm,
-    ConnectorForm,
+    
   ],
 
 
