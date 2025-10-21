@@ -5,7 +5,7 @@ import { GetConnectorType } from './get-connector-type/get-connector-type';
 import { EditConnectorType } from './edit-connector-type/edit-connector-type';
 
 const routes: Routes = [
-  {path: 'connector-form', component: ConnectorForm},
+  // {path: 'connector-form', component: ConnectorForm},
   {path: 'connector-get', component: GetConnectorType},
   {path: 'Connector-edit', component: EditConnectorType},
 ];

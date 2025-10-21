@@ -9,6 +9,9 @@ import { CommonModule } from '@angular/common';
 import { Home } from './home/home';
 import { SinglePageForm } from './single-page-form/single-page-form';
 import { HttpClientModule, provideHttpClient } from '@angular/common/http';
+import { ConfirmationDialogBox } from './components/confirmation-dialog-box/confirmation-dialog-box';
+import { MatDialogModule } from '@angular/material/dialog';
+import { ConnectorTypeMetadataschemaView } from './components/dialog/connector-type-metadataschema-view/connector-type-metadataschema-view';
 
 
 
@@ -19,6 +22,8 @@ import { HttpClientModule, provideHttpClient } from '@angular/common/http';
     MultiStepForm,
     Home,
     SinglePageForm,
+    ConfirmationDialogBox,
+    ConnectorTypeMetadataschemaView,
     
   ],
 
@@ -29,6 +34,7 @@ import { HttpClientModule, provideHttpClient } from '@angular/common/http';
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
+    MatDialogModule,
 
   ],
   providers: [

@@ -1,101 +1,287 @@
-<div class="max-w-6xl mx-auto p-6">
-  <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-semibold text-gray-800">Connector Types</h1>
-    <div class="space-x-2">
-      <button (click)="onCreate()"
-              class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
-        + Create
-      </button>
-      <button (click)="loadList()"
-              class="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-50">
-        Refresh
-      </button>
-    </div>
-  </div>
+<div class="max-w-7xl mx-auto px-6 py-6">
+  <div class="max-w-full mx-auto px-4 py-8 space-y-8">
 
-  <div *ngIf="loading" class="py-12 text-center text-gray-500">Loading connector types...</div>
-  <div *ngIf="error" class="py-4 text-sm text-red-600">{{ error }}</div>
+    <div *ngIf="showCreateForm" class="max-w-3xl mt-10 mx-auto px-6 py-6 bg-gray-50 rounded-xl shadow-md">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-semibold text-gray-800 text-center">
+          {{ editId === null ? 'Create Connection Type' : 'Edit Connection Type' }}
+        </h2>
+        <button (click)="cancelCreate()" class="ml-4 px-3 py-1 rounded border bg-red-400 text-white hover:bg-red-600">
+          Cancel
+        </button>
+      </div>
 
-  <div *ngIf="!loading && connectors.length === 0" class="py-8 text-gray-600">No connector types found.</div>
+      <form [formGroup]="connectionForm"
+        (ngSubmit)="editId === null ? createConnectorType() : updateConnectorType(editId)" class="space-y-6 mt-4">
 
-  <div *ngIf="connectors.length > 0" class="overflow-x-auto bg-white border border-gray-100 rounded-lg shadow-sm">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
-        <tr>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Name</th>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Display Name</th>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Category</th>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Metadata</th>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Description</th>
-          <th class="px-4 py-3 text-right text-sm font-medium text-gray-600">Actions</th>
-        </tr>
-      </thead>
+        <!-- Basic Fields -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Name</label>
+            <input type="text" formControlName="name"
+              class="border border-gray-300 rounded-lg w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              placeholder="Enter connection name" />
+          </div>
 
-      <tbody class="bg-white divide-y divide-gray-100">
-        <tr *ngFor="let c of connectors" class="hover:bg-gray-50">
-          <td class="px-4 py-3 text-sm text-gray-700">{{ c.name }}</td>
-          <td class="px-4 py-3 text-sm text-gray-700">{{ c.displayName }}</td>
-          <td class="px-4 py-3 text-sm text-gray-700">{{ c.category }}</td>
-          <td class="px-4 py-3 text-sm text-gray-700">{{ metadataSummary(c) }}</td>
-          <td class="px-4 py-3 text-sm text-gray-600 truncate max-w-xs">{{ c.description || '—' }}</td>
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Display Name</label>
+            <input type="text" formControlName="displayName"
+              class="border border-gray-300 rounded-lg w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              placeholder="Enter display name" />
+          </div>
 
-          <td class="px-4 py-3 text-right text-sm">
-            <div class="inline-flex items-center gap-2">
-              <button (click)="onView(c)"
-                      class="px-3 py-1.5 rounded-md border border-gray-200 text-sm hover:bg-gray-50">
-                View
-              </button>
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Category</label>
+            <select formControlName="category"
+              class="border border-gray-300 rounded-lg w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+              <option value="">Select Category</option>
+              <option value="database">Database</option>
+              <option value="api">API</option>
+              <option value="file">File</option>
+              <!-- <option value="cloud service">Cloud Service</option> -->
+            </select>
 
-              <button (click)="onEdit(c)"
-                      class="px-3 py-1.5 rounded-md border border-gray-200 text-sm hover:bg-gray-50">
-                Edit
-              </button>
+            <div *ngIf="connectionForm.get('category')?.invalid && connectionForm.get('category')?.touched"
+              class="text-red-500 text-sm mt-1">
+              Please select a category
+            </div>
+          </div>
 
-              <button (click)="onDelete(c)" [disabled]="c.id && deletingMap[c.id]"
-                      class="px-3 py-1.5 rounded-md border border-red-300 text-sm text-red-600 hover:bg-red-50 disabled:opacity-60">
-                <span *ngIf="c.id && deletingMap[c.id]" class="inline-block animate-pulse">Deleting…</span>
-                <span *ngIf="!(c.id && deletingMap[c.id])">Delete</span>
+
+
+          <!-- <div>
+            <label class="block font-medium text-gray-700 mb-1">Connector Type</label>
+            <input type="text" formControlName="connector_type"
+              class="border border-gray-300 rounded-lg w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              placeholder="e.g. SQL, NoSQL" />
+          </div> -->
+        </div>
+
+        <!-- Metadata Schema -->
+        <div class="mt-8">
+          <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Metadata Schema</h3>
+
+          <div formArrayName="metadataSchema">
+            <div *ngFor="let field of metadataSchema.controls; let i = index" [formGroupName]="i"
+              class="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50 relative shadow-sm">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-gray-700 mb-1">Key</label>
+                  <input formControlName="key"
+                    class="border border-gray-300 rounded-lg w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                    placeholder="e.g. host" />
+                </div>
+
+                <div>
+                  <label class="block text-gray-700 mb-1">Label</label>
+                  <input formControlName="label"
+                    class="border border-gray-300 rounded-lg w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                    placeholder="e.g. Host" />
+                </div>
+
+                <div>
+                  <label class="block text-gray-700 mb-1">Required</label>
+                  <div class="flex items-center space-x-2">
+                    <input type="checkbox" formControlName="required"
+                      class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-400" />
+                    <span class="text-sm text-gray-600">Mark as required</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-gray-700 mb-1">Type</label>
+                  <select formControlName="type"
+                    class="border border-gray-300 rounded-lg w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                    <option value="">Select Type</option>
+                    <option value="string">String</option>
+                    <option value="number">Number</option>
+                    <option value="boolean">Boolean</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Remove Button -->
+              <button type="button" (click)="removeMetadataField(i)"
+                class="absolute top-2 right-2 text-red-500 hover:text-red-700 text-lg font-bold" title="Remove field">
+                ✕
               </button>
             </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+          </div>
 
-<!-- Simple Modal for viewing connector JSON -->
-<div *ngIf="isViewing" class="fixed inset-0 z-40 flex items-center justify-center p-4">
-  <div class="absolute inset-0 bg-black/40" (click)="closeView()"></div>
+          <div class="flex justify-center sm:justify-start">
+            <button type="button" (click)="addMetadataField()"
+              class="mt-2 bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+              + Add Metadata Field
+            </button>
+          </div>
+        </div>
 
-  <div class="relative max-w-3xl w-full bg-white rounded-lg shadow-xl overflow-hidden">
-    <div class="flex items-center justify-between px-4 py-3 border-b">
-      <h3 class="text-lg font-medium text-gray-800">Connector Details</h3>
-      <button (click)="closeView()" class="text-gray-500 hover:text-gray-800">✕</button>
+        <!-- Submit -->
+        <div class="mt-8 text-center sm:text-left">
+          <button type="submit"
+            class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium shadow-md transition duration-200 cursor-pointer">
+            {{ editId === null ? 'Add Connector Type' : 'Update Connector Type' }}
+          </button>
+        </div>
+      </form>
     </div>
 
-    <div class="p-4 prose max-h-96 overflow-auto">
-      <div class="mb-3">
-        <strong>Name:</strong> {{ selectedConnector?.name }}
-      </div>
-      <div class="mb-3">
-        <strong>Display Name:</strong> {{ selectedConnector?.displayName }}
-      </div>
-      <div class="mb-3">
-        <strong>Category:</strong> {{ selectedConnector?.category }}
-      </div>
-      <div class="mb-3">
-        <strong>Description:</strong> {{ selectedConnector?.description || '—' }}
+    <!-- Table Section (Always Visible) -->
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-2xl font-semibold text-gray-800 ml-10">Connector Types</h1>
+        <div class="space-x-2">
+          <button (click)="onCreate()"
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition mr-10">
+            + Create Connector Type
+          </button>
+        </div>
       </div>
 
-      <div class="mb-3">
-        <strong>metadataSchema</strong>
-        <pre class="mt-2 text-sm bg-gray-100 rounded p-3 whitespace-pre-wrap">{{ selectedConnector?.metadataSchema | json }}</pre>
+      <!-- Table -->
+      <div class="p-6 pt-0">
+        <div class="relative w-full overflow-auto space-y-2">
+
+          <!-- Search Box -->
+          <div class="w-full px-2 sm:px-4 mt-1">
+            <input (input)="searchFilter($event)" placeholder="Filter results..."
+              class="w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-base placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 md:text-sm transition" />
+          </div>
+
+          <div class="overflow-x-auto mt-6">
+            <table mat-table [dataSource]="dataSource" matSort class="min-w-full divide-y divide-blue-100">
+              <!-- Index Column -->
+              <ng-container matColumnDef="index">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  class="text-left px-4 py-3 font-medium !bg-white !border-b !border-gray-200">
+                  #
+                </th>
+                <td mat-cell *matCellDef="let conn; let i = index"
+                  class="px-4 py-2 text-sm !bg-white !border-b !border-gray-200">
+                  {{ i + 1 }}
+                </td>
+              </ng-container>
+
+              <!-- Name Column -->
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  class="text-left px-4 py-3 font-medium !bg-white !border-b !border-gray-200">
+                  Name
+                </th>
+                <td mat-cell *matCellDef="let conn" class="px-4 py-2 text-sm !bg-white !border-b !border-gray-200">
+                  {{ conn.name }}
+                </td>
+              </ng-container>
+
+              <!-- Display Name Column -->
+              <ng-container matColumnDef="displayName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  class="text-left px-4 py-3 font-medium !bg-white !border-b !border-gray-200">
+                  Display Name
+                </th>
+                <td mat-cell *matCellDef="let conn" class="px-4 py-2 text-sm !bg-white !border-b !border-gray-200">
+                  {{ conn.displayName }}
+                </td>
+              </ng-container>
+
+              <!-- Category Column -->
+              <ng-container matColumnDef="category">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  class="text-left px-4 py-3 font-medium !bg-white !border-b !border-gray-200">
+                  Category
+                </th>
+                <td mat-cell *matCellDef="let conn" class="px-4 py-2 text-sm !bg-white !border-b !border-gray-200">
+                  {{ conn.category }}
+                </td>
+              </ng-container>
+
+              <!-- Metadata Column -->
+              <ng-container matColumnDef="metadata">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  class="text-left px-4 py-3 font-medium !bg-white !border-b !border-gray-200">
+                  Metadata
+                </th>
+                <td mat-cell *matCellDef="let conn" class="px-4 py-2 text-sm !bg-white !border-b !border-gray-200">
+                  <div class="flex items-center space-x-3">
+                    <span>{{ conn.metadataSchema?.length || 0 }} field{{ conn.metadataSchema?.length === 1 ? '' : 's'
+                      }}</span>
+                    <button *ngIf="conn.metadataSchema?.length" (click)="viewMetadata(conn.metadataSchema)"
+                      class="px-2 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">
+                      Expand
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef
+                  class="text-left px-4 py-3 font-medium !bg-white !border-b !border-gray-200">
+                  Actions
+                </th>
+                <td mat-cell *matCellDef="let conn" class="px-4 py-2 text-sm !bg-white !border-b !border-gray-200">
+                  <div class="flex space-x-2">
+                    <button (click)="onView(conn)"
+                      class="inline-flex items-center justify-center gap-2 text-md border border-input bg-background h-9 rounded-md px-3 cursor-pointer hover:bg-gray-100">
+                      <i class="bi bi-eye-fill text-blue-500"></i>
+                    </button>
+                    <button (click)="onEdit(conn)"
+                      class="inline-flex items-center justify-center gap-2 text-md border border-input bg-background h-9 rounded-md px-3 cursor-pointer hover:bg-gray-100">
+                      <i class="bi bi-pencil-square text-yellow-500"></i>
+                    </button>
+                    <button (click)="onDelete(conn)"
+                      class="inline-flex items-center justify-center gap-2 text-md border border-input bg-background h-9 rounded-md px-3 cursor-pointer hover:bg-gray-100">
+                      <i class="bi bi-trash-fill text-red-500"></i>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Render Header & Rows -->
+              <tr mat-header-row *matHeaderRowDef="displayedColumns" class="font-medium"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                class="hover:bg-blue-50 transition duration-200"></tr>
+            </table>
+
+            <!-- Paginator -->
+            <mat-paginator class="!bg-white" [pageSize]="5" [pageSizeOptions]="[5, 10, 25, 100]"
+              aria-label="Select page" [showFirstLastButtons]="true">
+            </mat-paginator>
+          </div>
+
+        </div>
       </div>
+
     </div>
 
-    <div class="px-4 py-3 border-t text-right">
-      <button (click)="closeView()" class="bg-gray-100 px-4 py-1.5 rounded hover:bg-gray-200">Close</button>
+    <!-- View Modal -->
+    <div *ngIf="isViewing" class="fixed inset-0 z-40 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/40" (click)="closeView()"></div>
+
+      <div class="relative max-w-3xl w-full bg-white rounded-lg shadow-xl overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-3 border-b">
+          <h3 class="text-lg font-medium text-gray-800">Connector Details</h3>
+          <button (click)="closeView()" class="text-gray-500 hover:text-gray-800">✕</button>
+        </div>
+
+        <div class="p-4 prose max-h-96 overflow-auto">
+          <div class="mb-3"><strong>Name:</strong> {{ selectedConnector?.name }}</div>
+          <div class="mb-3"><strong>Display Name:</strong> {{ selectedConnector?.displayName }}</div>
+          <div class="mb-3"><strong>Category:</strong> {{ selectedConnector?.category }}</div>
+          <div class="mb-3"><strong>Description:</strong> {{ selectedConnector?.description || '—' }}</div>
+          <div class="mb-3">
+            <strong>Metadata Schema:</strong>
+            <pre class="mt-2 text-sm bg-gray-100 rounded p-3 whitespace-pre-wrap">
+                {{ selectedConnector?.metadataSchema | json }}
+        </pre>
+          </div>
+        </div>
+
+        <div class="px-4 py-3 border-t text-right">
+          <button (click)="closeView()" class="bg-gray-100 px-4 py-1.5 rounded hover:bg-gray-200">Close</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
