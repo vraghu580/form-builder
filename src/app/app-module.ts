@@ -8,13 +8,13 @@ import { MultiStepForm } from './multi-step-form/multi-step-form';
 import { CommonModule } from '@angular/common';
 import { Home } from './home/home';
 import { SinglePageForm } from './single-page-form/single-page-form';
-import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { TemplatePreviewDialog } from './dialogs/template-preview-dialog/template-preview-dialog';
-import { ConnectorForm } from './connector-form/connector-form';
 import { HttpClientModule, provideHttpClient } from '@angular/common/http';
-import { ConnectMysql } from './connect-mysql/connect-mysql';
-import { ConnectToPostgresql } from './connect-to-postgresql/connect-to-postgresql';
+import { ConfirmationDialogBox } from './components/confirmation-dialog-box/confirmation-dialog-box';
+import { MatDialogModule } from '@angular/material/dialog';
+import { ConnectorTypeMetadataschemaView } from './components/dialog/connector-type-metadataschema-view/connector-type-metadataschema-view';
+import { ConnectorForm } from './connector-type/connector-form/connector-form';
 
 
 
@@ -25,10 +25,7 @@ import { ConnectToPostgresql } from './connect-to-postgresql/connect-to-postgres
     MultiStepForm,
     Home,
     SinglePageForm,
-    TemplatePreviewDialog,
     ConnectorForm,
-    ConnectMysql,
-    ConnectToPostgresql,
   ],
 
 
@@ -38,9 +35,6 @@ import { ConnectToPostgresql } from './connect-to-postgresql/connect-to-postgres
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
-    MatDialogModule,
-    MatButtonModule,
-    BrowserModule
 
   ],
   providers: [

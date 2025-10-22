@@ -4,6 +4,7 @@ import { DataEngineMain } from './components/data-engine-main/data-engine-main';
 import { ConnectManageSource } from './components/connect-manage-source/connect-manage-source';
 import { DataSchema } from './components/data-schema/data-schema';
 import { DataEngineRoutingModule } from './data-engine-routing-module';
+import { FormsModule } from '@angular/forms';
 
 
 
@@ -16,6 +17,7 @@ import { DataEngineRoutingModule } from './data-engine-routing-module';
   imports: [
     CommonModule,
     DataEngineRoutingModule,
+    FormsModule
   ]
 })
 export class DataEngineModule { }

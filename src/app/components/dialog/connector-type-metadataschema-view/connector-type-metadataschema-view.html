@@ -1,0 +1,29 @@
+<div class="p-6 bg-white rounded-lg shadow-lg w-[500px] max-h-[90vh] overflow-y-auto">
+  <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Metadata Fields</h2>
+
+  <div *ngIf="data?.metadata?.length > 0; else noData">
+    <div *ngFor="let field of data.metadata; let i = index" class="border rounded-lg p-3 mb-3 bg-gray-50">
+      <div class="flex justify-between">
+        <p class="font-medium text-gray-700">#{{ i + 1 }}</p>
+        <p class="text-sm text-gray-500">Required: 
+          <span [ngClass]="field.required ? 'text-green-600' : 'text-red-600'">
+            {{ field.required ? 'Yes' : 'No' }}
+          </span>
+        </p>
+      </div>
+      <p><strong>Key:</strong> {{ field.key }}</p>
+      <p><strong>Label:</strong> {{ field.label }}</p>
+      <p><strong>Type:</strong> {{ field.type }}</p>
+    </div>
+  </div>
+
+  <ng-template #noData>
+    <p class="text-gray-500 text-center py-4">No metadata fields available.</p>
+  </ng-template>
+
+  <div class="mt-4 text-right">
+    <button (click)="closeDialog()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+      Close
+    </button>
+  </div>
+</div>
