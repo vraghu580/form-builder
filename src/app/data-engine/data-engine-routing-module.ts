@@ -5,9 +5,18 @@ import { DataEngineMain } from './components/data-engine-main/data-engine-main';
 import { DataSchema } from './components/data-schema/data-schema';
 
 const routes: Routes = [
-  {path : 'connect-manage', component: ConnectManageSource},
-  {path : 'data-engine', component: DataEngineMain},
-  {path : 'data-schema', component: DataSchema}
+
+  {
+    path: '', component: DataEngineMain,
+    children: [
+      { path: '', redirectTo: 'grievance-queue', pathMatch: 'full' },
+      { path: 'connect-manage', component: ConnectManageSource },
+      { path: 'data-schema', component: DataSchema },
+
+
+
+    ]
+  },
 ];
 
 @NgModule({

@@ -1,1 +1,30 @@
-<p>data-engine-main works!</p>
+<div class="min-h-screen bg-gray-50">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+        <!-- Header -->
+        <div class="flex items-center gap-3 px-6 py-4 text-sm text-gray-600 ml-10">
+            <button (click)="backToHome()">
+            <i class="bi bi-arrow-left"></i>
+            Back to Dashboard</button>
+
+            <h1 class="text-2xl font-semibold text-gray-900 ml-10">Data Engine</h1>
+        </div>
+
+
+        <div class="mt-6 px-6">
+            <div class="flex rounded-lg bg-gray-100 p-1 ">
+
+                <button class="flex-1 px-4 py-2 text-sm rounded-md transition hover:bg-white hover:shadow"
+                    routerLink="/data-engine/connect-manage" routerLinkActive="bg-white text-black">Connect & Manage
+                    Source
+                </button>
+                <button class="flex-1 px-4 py-2 text-sm rounded-md transition hover:bg-white hover:shadow"
+                    routerLink="/data-engine/data-schema" routerLinkActive="bg-white text-black">Data Schema </button>
+                <button class="flex-1 px-4 py-2 text-sm rounded-md transition hover:bg-white hover:shadow">Form
+                    Builder</button>
+            </div>
+        </div>
+
+        <router-outlet></router-outlet>
+    </div>
+</div>
