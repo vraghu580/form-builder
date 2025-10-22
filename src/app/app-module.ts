@@ -8,10 +8,13 @@ import { MultiStepForm } from './multi-step-form/multi-step-form';
 import { CommonModule } from '@angular/common';
 import { Home } from './home/home';
 import { SinglePageForm } from './single-page-form/single-page-form';
+import { MatButtonModule } from '@angular/material/button';
+import { TemplatePreviewDialog } from './dialogs/template-preview-dialog/template-preview-dialog';
 import { HttpClientModule, provideHttpClient } from '@angular/common/http';
 import { ConfirmationDialogBox } from './components/confirmation-dialog-box/confirmation-dialog-box';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ConnectorTypeMetadataschemaView } from './components/dialog/connector-type-metadataschema-view/connector-type-metadataschema-view';
+import { ConnectorForm } from './connector-type/connector-form/connector-form';
 
 
 
@@ -22,9 +25,7 @@ import { ConnectorTypeMetadataschemaView } from './components/dialog/connector-t
     MultiStepForm,
     Home,
     SinglePageForm,
-    ConfirmationDialogBox,
-    ConnectorTypeMetadataschemaView,
-    
+    ConnectorForm,
   ],
 
 
@@ -34,7 +35,6 @@ import { ConnectorTypeMetadataschemaView } from './components/dialog/connector-t
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
-    MatDialogModule,
 
   ],
   providers: [

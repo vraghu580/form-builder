@@ -10,8 +10,14 @@
       </div>
       <div class="flex flex-col text-center md:text-left">
         <h1 class="text-lg font-bold text-gray-900">Multi-Step Form Designer</h1>
-        <p class="text-sm font-semibold text-gray-500">Design your multi-step form</p>
+        <p class="text-sm font-medium text-gray-500">Design your multi-step form</p>
       </div>
+
+      <button type="button" (click)="saveForm()"
+  class="inline-flex items-center justify-center text-sm font-medium border rounded-md gap-1.5 px-3 py-1 bg-black text-white hover:bg-gray-800">
+  <i class="bi bi-floppy"></i> Save Form
+</button>
+
       <div class="flex gap-2 justify-center md:justify-end"></div>
     </div>
 
@@ -22,10 +28,10 @@
         <div class="bg-white border border-gray-200 rounded-lg p-4">
           <div class="flex justify-between items-center mb-3">
             <div class="flex gap-2">
-              <button class="px-3 py-1.5 rounded-md text-sm font-semibold border border-gray-200"
+              <button class="px-3 py-1.5 rounded-md text-sm font-medium border border-gray-200"
                 [ngClass]="activeTab === 'fields' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'"
                 (click)="activeTab = 'fields'">Field Types</button>
-              <button class="px-3 py-1.5 rounded-md text-sm font-semibold border border-gray-200"
+              <button class="px-3 py-1.5 rounded-md text-sm font-medium border border-gray-200"
                 [ngClass]="activeTab === 'steps' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'"
                 (click)="activeTab = 'steps'">Steps</button>
             </div>
@@ -37,7 +43,7 @@
             <div class="mb-3">
               <div class="text-[11px] font-bold  uppercase tracking-wide mb-2">Basic</div>
               <div class="grid grid-cols-2 gap-2">
-                <button class="flex flex-col items-center justify-center gap-1.5 py-3 px-2 border border-gray-200 rounded-md bg-white hover:bg-gray-50 transition text-[11px] font-semibold" (click)="addFieldToStep(fieldTypes[0])">
+                <button class="flex flex-col items-center justify-center gap-1.5 py-3 px-2 border border-gray-200 rounded-md bg-white hover:bg-gray-50 transition text-[11px] font-medium" (click)="addFieldToStep(fieldTypes[0])">
                   <i class="bi-type text-lg text-gray-700"></i><span>Text Input</span>
                 </button>
                 <button class="flex flex-col items-center justify-center gap-1.5 py-3 px-2 border border-gray-200 rounded-md bg-white hover:bg-gray-50 transition text-[11px] font-medium" (click)="addFieldToStep(fieldTypes[2])">
@@ -95,7 +101,7 @@
 
             <!-- Advanced -->
             <div>
-              <div class="text-[11px] font-semibold  uppercase tracking-wide mb-2">Advanced</div>
+              <div class="text-[11px] font-medium  uppercase tracking-wide mb-2">Advanced</div>
               <div class="grid grid-cols-2 gap-2">
                 <button class="flex flex-col items-center justify-center gap-1.5 py-3 px-2 border border-gray-200 rounded-md bg-white hover:bg-gray-50 transition text-[11px] font-medium" (click)="addFieldToStep({label:'Rating', type:'rating', icon:'bi-star'})">
                   <i class="bi-star text-lg text-gray-700"></i><span>Rating</span>
@@ -119,7 +125,7 @@
           <!-- Steps list -->
           <div *ngIf="activeTab === 'steps'" class="transition-all">
             <div class="flex justify-between items-center mb-3 mt-2">
-              <div class="text-base font-semibold">Steps</div>
+              <div class="text-base font-medium">Steps</div>
               <button class="text-xs px-3 py-1 border border-gray-400 rounded hover:bg-gray-100 font-medium" (click)="addStep()">+ Add Step</button>
             </div>
             <div class="flex flex-col gap-2">
@@ -127,7 +133,7 @@
                    class="rounded-md p-3 border border-gray-300 cursor-pointer hover:bg-gray-50"
                    [ngClass]="currentStep === i ? 'bg-blue-100 border-blue-400' : ''">
                 <div class="flex justify-between items-center">
-                  <input [(ngModel)]="step.title" class="font-semibold text-sm text-gray-900 bg-transparent border-none focus:ring-0 w-full" placeholder="Step title..." />
+                  <input [(ngModel)]="step.title" class="font-medium text-sm text-gray-900 bg-transparent border-none focus:ring-0 w-full" placeholder="Step title..." />
                   <button class="text-gray-400 hover:text-red-600 ml-2" (click)="removeStep(i); $event.stopPropagation()">
                     <i class="bi bi-trash"></i>
                   </button>
@@ -193,7 +199,7 @@
                          'bg-gray-200 border-gray-200 text-gray-500': i > currentStep
                        }"
                        style="width: 36px; height: 36px;">
-                    <span class="font-semibold">{{ i + 1 }}</span>
+                    <span class="font-medium">{{ i + 1 }}</span>
                   </div>
                   <span class="mt-2 text-xs font-medium text-ellipsis overflow-hidden whitespace-nowrap"
                         [ngClass]="i === currentStep ? 'text-blue-600' : 'text-gray-500'"
@@ -205,7 +211,7 @@
             </div>
 
             <!-- Step Content -->
-            <div class="mb-2 font-semibold text-lg text-gray-900">{{ steps[currentStep].title }}</div>
+            <div class="mb-2 font-medium text-lg text-gray-900">{{ steps[currentStep].title }}</div>
             <div class="mb-1 text-sm text-gray-500">{{ steps[currentStep].description }}</div>
 
             <div *ngIf="steps[currentStep].fields.length === 0"
@@ -217,7 +223,7 @@
                  class="flex flex-col sm:flex-row items-center gap-2 cursor-pointer w-full border border-gray-100 rounded-md p-2 hover:bg-gray-50"
                  [ngClass]="selectedFieldIndex === fi ? 'bg-blue-50 border-l-4 border-blue-500 pl-2' : ''"
                  (click)="selectField(fi)">
-              <label class="w-full sm:w-1/3 text-sm font-semibold text-gray-900 truncate">{{ field.label }}</label>
+              <label class="w-full sm:w-1/3 text-sm font-medium text-gray-900 truncate">{{ field.label }}</label>
               <input [type]="field.type" [formControlName]="field.label" [placeholder]="field.placeholder"
                      class="flex-1 min-w-0 border border-gray-300 rounded-md px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto max-w-[90vw]" />
               <button type="button" (click)="removeFieldFromStep(fi)" class="text-gray-400 hover:text-red-600">
@@ -228,8 +234,8 @@
             <!-- Form Navigation -->
             <div class="flex justify-between mt-10 rounded-md border border-gray-200 shadow-sm hover:shadow-md bg-white p-4">
               <button class="px-4 py-2 rounded bg-gray-100 text-black font-medium" (click)="previousStep()" [disabled]="currentStep === 0">Previous</button>
-              <button class="px-4 py-2 rounded bg-gray-100 text-black font-semibold" (click)="submitForm()">Submit</button>
-              <button class="px-4 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700" (click)="nextStep()" [disabled]="currentStep === steps.length - 1">Next</button>
+              <button class="px-4 py-2 rounded bg-gray-100 text-black font-medium" (click)="submitForm()">Submit</button>
+              <button class="px-4 py-2 rounded bg-blue-600 text-white font-medium hover:bg-blue-700" (click)="nextStep()" [disabled]="currentStep === steps.length - 1">Next</button>
             </div>
           </form>
         </div>
@@ -238,7 +244,7 @@
       <!-- Right Panel -->
       <div class="w-full lg:w-80 bg-white border border-gray-200 rounded-lg shadow-sm">
         <div class="p-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold">Properties</h3>
+          <h3 class="text-lg font-medium">Properties</h3>
           <p class="text-sm font-medium text-gray-500">Configure selected element</p>
         </div>
 

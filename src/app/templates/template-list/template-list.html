@@ -1,0 +1,25 @@
+<div class="max-w-7xl mx-auto p-6">
+  <h1 class="text-2xl font-semibold mb-6 text-gray-800">
+    Select a Template to Start Building
+  </h1>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div
+      *ngFor="let t of templates"
+      class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-5 flex flex-col justify-between"
+    >
+      <div>
+        <h2 class="text-lg font-bold text-gray-800 mb-2">{{ t.name }}</h2>
+        <p class="text-gray-600 text-sm mb-3">{{ t.description }}</p>
+        <p class="text-xs text-gray-400">Fields: {{ t.fields }}</p>
+        <p class="text-xs text-gray-400">Created: {{ t.createdAt | date:'mediumDate' }}</p>
+      </div>
+      <button
+        (click)="useTemplate(t.id)"
+        class="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+      >
+        Use Template
+      </button>
+    </div>
+  </div>
+</div>
