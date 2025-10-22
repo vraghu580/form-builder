@@ -8,15 +8,14 @@ import { MultiStepForm } from './multi-step-form/multi-step-form';
 import { CommonModule } from '@angular/common';
 import { Home } from './home/home';
 import { SinglePageForm } from './single-page-form/single-page-form';
-<<<<<<< HEAD
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { TemplatePreviewDialog } from './dialogs/template-preview-dialog/template-preview-dialog';
-=======
 import { ConnectorForm } from './connector-form/connector-form';
 import { HttpClientModule, provideHttpClient } from '@angular/common/http';
+import { ConnectMysql } from './connect-mysql/connect-mysql';
+import { ConnectToPostgresql } from './connect-to-postgresql/connect-to-postgresql';
 
->>>>>>> 50591f35d6aaf172e929b51b526c3202be758993
 
 
 
@@ -26,11 +25,10 @@ import { HttpClientModule, provideHttpClient } from '@angular/common/http';
     MultiStepForm,
     Home,
     SinglePageForm,
-<<<<<<< HEAD
     TemplatePreviewDialog,
-=======
     ConnectorForm,
->>>>>>> 50591f35d6aaf172e929b51b526c3202be758993
+    ConnectMysql,
+    ConnectToPostgresql,
   ],
 
 

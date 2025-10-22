@@ -1,34 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { Template, FormTemplate } from '../../services/template';
 import { TemplatePreviewDialog } from '../../dialogs/template-preview-dialog/template-preview-dialog';
-import { Template } from '../../services/template';
-
-export interface FormField {
-  label: string;
-  type: string;
-}
-
-export interface FormSubSection {
-  subsection?: string;
-  fields?: FormField[];
-}
-
-export interface FormSection {
-  section?: string;
-  fields?: FormField[];
-  subsections?: FormSubSection[];
-}
-
-export interface FormTemplate {
-  id: number;
-  title: string;
-  description: string;
-  type: string;
-  sections?: FormSection[];
-  fields?: FormField[];
-  isEditMode?: boolean;
-}
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-form-templates',
@@ -36,8 +11,8 @@ export interface FormTemplate {
   templateUrl: './form-templates.html',
   styleUrl: './form-templates.scss'
 })
-export class FormTemplates {
-  constructor(private router: Router, private template: Template, private dialog: MatDialog) {}
+export class FormTemplates implements OnDestroy {
+  private templateUpdateSub?: Subscription;
 
   templates: FormTemplate[] = [
     {
@@ -45,7 +20,6 @@ export class FormTemplates {
       title: 'Employee Onboarding Form',
       type: 'single-page',
       description: 'Collect personal and job-related details of new employees.',
-
       fields: [
         { label: 'Full Name', type: 'text' },
         { label: 'Email ID', type: 'email' },
@@ -193,7 +167,26 @@ export class FormTemplates {
     }
   ];
 
-  // ✅ Preview Dialog
+  constructor(private router: Router, private template: Template, private dialog: MatDialog) {
+
+    // ✅ FIX: Subscribe to update or new template and update list live
+    this.templateUpdateSub = this.template.onTemplateUpdate().subscribe((updatedTemplate) => {
+      if (!updatedTemplate?.id) return;
+
+      const idx = this.templates.findIndex(t => t.id === updatedTemplate.id);
+
+      if (idx !== -1) {
+        // update existing
+        this.templates[idx] = { ...this.templates[idx], ...updatedTemplate };
+        console.log('✅ Template updated:', this.templates[idx]);
+      } else {
+        // add new
+        this.templates.push({ ...updatedTemplate });
+        console.log('✅ New template added:', updatedTemplate);
+      }
+    });
+  }
+
   openPreviewDialog(template: FormTemplate): void {
     console.log('Opening preview for:', template.title);
     this.dialog.open(TemplatePreviewDialog, {
@@ -202,26 +195,26 @@ export class FormTemplates {
     });
   }
 
-  // ✅ Unified openTemplate function with mode control
   openTemplate(templateId: number, mode: 'edit' | 'new' = 'new') {
     const selectedTemplate = this.templates.find(t => t.id === templateId);
     if (!selectedTemplate) return;
 
     const templateToPass: FormTemplate =
       mode === 'edit'
-        ? { ...selectedTemplate, isEditMode: true }
+        ? { ...selectedTemplate, isEditMode: true, type: selectedTemplate.type }
         : {
             ...selectedTemplate,
-            id: Date.now(), // generate new ID
+            id: Date.now(),
             title: selectedTemplate.title + ' (Copy)',
-            isEditMode: false
+            isEditMode: false,
+            type: selectedTemplate.type || 'single-page'
           };
 
-    console.log(`Navigating to ${mode === 'edit' ? 'Edit' : 'New'} Form:`, templateToPass);
-
+    // ✅ FIX: Store selected template in service before navigating
     this.template.setTemplate(templateToPass);
 
-    switch (selectedTemplate.type) {
+    // ✅ FIX: Navigate based on type
+    switch (templateToPass.type) {
       case 'single-page':
         this.router.navigate(['/single-form', templateToPass.id]);
         break;
@@ -232,12 +225,16 @@ export class FormTemplates {
         this.router.navigate(['/form/form-page', templateToPass.id]);
         break;
       default:
-        console.error('Unknown form type:', selectedTemplate.type);
+        console.error('Unknown form type:', templateToPass.type);
         break;
     }
   }
 
   exit() {
-    this.router.navigate(['/']);
+    this.router.navigate(['/formtemplates']);
+  }
+
+  ngOnDestroy() {
+    this.templateUpdateSub?.unsubscribe();
   }
 }

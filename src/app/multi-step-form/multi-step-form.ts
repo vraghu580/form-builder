@@ -40,7 +40,7 @@ export class MultiStepForm {
 
   formTitle: string = 'Form Title';
   formDescription: string = 'Form description goes here';
-  formType: string ='Single Page Form';
+  formType: string = 'Multi Step Form';
 
   activeTab: 'fields' | 'steps' = 'fields';
   steps: Step[] = [
@@ -60,11 +60,9 @@ export class MultiStepForm {
 
   ngOnInit() {
     const selectedTemplate = this.templateService.getTemplate();
-
     if (selectedTemplate) {
-      // this.formTitle = selectedTemplate.title || 'Form Title';
-      // this.formDescription = selectedTemplate.description || 'Form description goes here';
-      // this.formType = selectedTemplate.type || 'unknown';   
+      this.formTitle = selectedTemplate.title || 'Form Title';
+      this.formDescription = selectedTemplate.description || 'Form description goes here';
 
       if (selectedTemplate.sections && selectedTemplate.sections.length > 0) {
         selectedTemplate.sections.forEach((section: any) => {
@@ -73,14 +71,13 @@ export class MultiStepForm {
               if (sub.fields && sub.fields.length > 0) {
                 sub.fields.forEach((field: any) => {
                   this.steps[this.currentStep].fields.push({
-                    label: field.label,
+                    label: field.label || field.name,
                     type: field.type,
-                    placeholder: field.label,
-                    value: '',
-                    required: false,
+                    placeholder: field.placeholder || field.label || '',
+                    value: field.value || '',
+                    required: field.required || false
                   });
                 });
-
               }
             });
           }
@@ -88,31 +85,6 @@ export class MultiStepForm {
       }
     }
   }
-saveForm() {
-  // Collect current values for each step from the reactive FormArray
-  const stepsValues = this.stepsFormArray.controls.map((grp) => grp.value);
-
-  const formStructure = {
-    title: this.formTitle,
-    description: this.formDescription,
-    type: this.formType,
-    steps: this.steps.map((step, si) => ({
-      title: step.title,
-      description: step.description,
-      fields: step.fields.map((f) => ({
-        label: f.label,
-        type: f.type,
-        placeholder: f.placeholder ?? '',
-        required: !!f.required,
-        value: stepsValues[si]?.[f.label] ?? null
-      }))
-    }))
-  };
-
-  console.log('💾 Form Structure:', JSON.stringify(formStructure, null, 2));
-  // TODO: send to API if needed
-}
-
 
   get stepsFormArray(): FormArray<FormGroup> {
     return this.form.get('steps') as FormArray<FormGroup>;
@@ -193,7 +165,6 @@ saveForm() {
     const field = this.steps[this.currentStep].fields[this.selectedFieldIndex];
     const form = this.stepsFormArray.at(this.currentStep) as FormGroup;
     const control = form.get(field.label);
-
     if (!control) return;
 
     field.required = !field.required;
@@ -219,6 +190,53 @@ saveForm() {
     this.previewMode = mode;
   }
 
+ saveForm() {
+  const stepsValues = this.stepsFormArray.controls.map(grp => grp.value);
+
+  const formStructure = {
+    title: this.formTitle,
+    description: this.formDescription,
+    type: 'multi-page',
+    sections: this.steps.map((step, si) => ({
+      title: step.title,
+      fields: step.fields.map((f: any) => ({
+        label: f.label,
+        type: f.type,
+        placeholder: f.placeholder ?? '',
+        required: !!f.required,
+        value: stepsValues[si]?.[f.label] ?? ''
+      })),
+      subsections: []
+    }))
+  };
+
+  const currentTemplate = this.templateService.getTemplate();
+
+  if (currentTemplate?.isEditMode) {
+    const updatedTemplate: any = {
+      ...currentTemplate,
+      ...formStructure,
+      id: currentTemplate.id
+    };
+
+    // ✅ Correct method for update
+    this.templateService.updateTemplate(updatedTemplate);
+    alert('✅ Template updated successfully!');
+  } else {
+    const newTemplate: any = {
+      ...formStructure,
+      id: Date.now(),
+      type: 'multi-page'
+    };
+
+    // ✅ Correct method for adding new
+    this.templateService.updateTemplate(newTemplate);
+    alert('✅ New template saved successfully!');
+  }
+
+  this.router.navigate(['/formtemplates']);
+}
+
   submitForm() {
     const formSchema = {
       steps: this.steps.map(step => ({
@@ -232,7 +250,6 @@ saveForm() {
         }))
       }))
     };
-
     console.log('Form Schema:', JSON.stringify(formSchema, null, 2));
     alert('✅ Form schema generated! Check console for details.');
   }

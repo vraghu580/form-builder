@@ -4,6 +4,10 @@ import { SinglePageForm } from './single-page-form/single-page-form';
 import { MultiStepForm } from './multi-step-form/multi-step-form';
 import { Home } from './home/home';
 import { ConnectorForm } from './connector-form/connector-form';
+import { FormTemplates } from './form/form-templates/form-templates';
+import { ConnectMysql } from './connect-mysql/connect-mysql';
+import { connect } from 'http2';
+import { ConnectToPostgresql } from './connect-to-postgresql/connect-to-postgresql';
 
 const routes: Routes = [
   {path : 'home', component: Home},
@@ -11,6 +15,9 @@ const routes: Routes = [
   {path : 'single-form/:id', component: SinglePageForm},
   {path : 'multi-form/:id', component: MultiStepForm },
   {path : 'connector-form', component: ConnectorForm},
+  {path:'formtemplates', component:FormTemplates},
+{path:'connect-mysql',component:ConnectMysql},
+{path:'connect-postgresql',component:ConnectToPostgresql},  
   {
     path: 'form',
     loadChildren: () =>
