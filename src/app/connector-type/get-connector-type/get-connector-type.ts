@@ -1,11 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { connectionTypeService } from '../../services/connection-type-service';
-import { finalize } from 'rxjs';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { Dialog } from '@angular/cdk/dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogBox } from '../../components/confirmation-dialog-box/confirmation-dialog-box';
 import { ConnectorTypeMetadataschemaView } from '../../components/dialog/connector-type-metadataschema-view/connector-type-metadataschema-view';
@@ -33,7 +31,7 @@ export interface ConnectorType {
 })
 export class GetConnectorType implements OnInit {
   connectionForm!: FormGroup;
-  displayedColumns: string[] = ['index', 'name', 'displayName', 'category', 'metadata', 'actions'];
+  displayedColumns: string[] = ['index', 'name', 'displayName', 'category', 'description', 'metadata', 'actions'];
   dataSource = new MatTableDataSource<ConnectorType>();
   connectors: ConnectorType[] = [];
   showCreateForm = false;
@@ -51,7 +49,7 @@ export class GetConnectorType implements OnInit {
       name: ['', Validators.required],
       displayName: ['', Validators.required],
       category: ['', Validators.required],
-      // connector_type: [''],
+      description: ['', Validators.required],
       metadataSchema: this.fb.array([])
     });
   }

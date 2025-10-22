@@ -38,7 +38,7 @@
               <option value="database">Database</option>
               <option value="api">API</option>
               <option value="file">File</option>
-              <!-- <option value="cloud service">Cloud Service</option> -->
+              <option value="cloud">Cloud </option>
             </select>
 
             <div *ngIf="connectionForm.get('category')?.invalid && connectionForm.get('category')?.touched"
@@ -47,14 +47,12 @@
             </div>
           </div>
 
-
-
-          <!-- <div>
-            <label class="block font-medium text-gray-700 mb-1">Connector Type</label>
-            <input type="text" formControlName="connector_type"
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">description</label>
+            <input type="text" formControlName="description"
               class="border border-gray-300 rounded-lg w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
               placeholder="e.g. SQL, NoSQL" />
-          </div> -->
+          </div>
         </div>
 
         <!-- Metadata Schema -->
@@ -96,6 +94,17 @@
                     <option value="string">String</option>
                     <option value="number">Number</option>
                     <option value="boolean">Boolean</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-gray-700 mb-1">Meta Data Type</label>
+                  <select formControlName="type"
+                    class="border border-gray-300 rounded-lg w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                    <option value="">Select Type</option>
+                    <option value="string">Basic</option>
+                    <option value="number">Authentication</option>
+                    <option value="boolean">Advanced</option>
                   </select>
                 </div>
               </div>
@@ -192,6 +201,17 @@
                 </th>
                 <td mat-cell *matCellDef="let conn" class="px-4 py-2 text-sm !bg-white !border-b !border-gray-200">
                   {{ conn.category }}
+                </td>
+              </ng-container>
+
+                   <!-- description -->
+                <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                  class="text-left px-4 py-3 font-medium !bg-white !border-b !border-gray-200">
+                  Description
+                </th>
+                <td mat-cell *matCellDef="let conn" class="px-4 py-2 text-sm !bg-white !border-b !border-gray-200">
+                  {{ conn.description }}
                 </td>
               </ng-container>
 

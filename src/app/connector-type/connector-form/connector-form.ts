@@ -2,21 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { connectionTypeService } from '../../services/connection-type-service';
 
-// export interface MetadataSchema {
-//   connection_string: string;
-//   username: string;
-//   password: string;
-//   port: number;
-// }
-
-// export interface ConnectorFormModel {
-//   category: string;
-//   name: string;
-//   connector_type: string;
-//   metadata_schema: MetadataSchema;
-//   image?: string; // optional
-// }
-
 @Component({
   selector: 'app-connector-form',
   standalone: false,
@@ -31,7 +16,7 @@ export class ConnectorForm {
       name: ['', Validators.required],
       displayName: ['', Validators.required],
       category: ['', Validators.required],
-      connector_type: ['', Validators.required],
+      description: ['', Validators.required],
       metadataSchema: this.fb.array([])
     });
   }
