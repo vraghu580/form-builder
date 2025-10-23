@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { connectionTypeService } from '../../../services/connection-type-service';
 
 type SourceType = 'database' | 'cloud' | 'api' | 'file';
@@ -27,7 +27,7 @@ interface SourceList {
 })
 export class ConnectManageSource implements OnInit {
 
-  constructor(private connectionService: connectionTypeService) { }
+  constructor(private connectionService: connectionTypeService, private cdr: ChangeDetectorRef) { }
 
 
   searchsource: string = '';
@@ -48,30 +48,28 @@ export class ConnectManageSource implements OnInit {
   }
 
 
-  loadConnections(): void {
-    this.connectionService.getAll().subscribe({
-      next: (res: any) => {
-        console.log('API Response:', res);
+loadConnections(): void {
+  this.connectionService.getAll().subscribe({
+    next: (res: any[]) => {
+       console.log('API Response:', res);
+      const data: Connection[] = res.map(item => ({
+        name: item.displayName || item.name || 'Untitled',
+        source: item.connector_type || item.category || 'Unknown',
+        kind: this.getKindFromCategory(item.category),
+        icon: this.iconName(item.category),
+        bgClass: this.iconBgClass(item.category),
+        iconClass: 'text-white text-xl'
+      }));
+      this.connectiondata = data;
+      this.connections = data;
+      this.updateGroupCounts(data);
+      this.cdr.detectChanges();
+    },
+    error: (err) => console.error('Failed to fetch connectors:', err)
+  });
+}
 
-        const data: Connection[] = res.map((item: any) => ({
-          name: item.displayName || item.name || 'Untitled',
-          source: item.connector_type || item.category || 'Unknown',
-          kind: this.getKindFromCategory(item.category),
-          icon: this.iconName(item.category),
-          bgClass: this.iconBgClass(item.category),
-          iconClass: 'text-white text-xl'
-        }));
-
-        this.connectiondata = data;
-        this.connections = data;
-        this.updateGroupCounts(data);
-
-      },
-      error: (err) => {
-        console.error(' Failed to fetch connectors:', err);
-      }
-    });
-  }
+  
 
   getKindFromCategory(category: string = ''): SourceType {
     const kindMap: Record<string, SourceType> = {
