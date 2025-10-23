@@ -10,10 +10,10 @@
     </mat-dialog-content>
 
     <mat-dialog-actions class="flex justify-end space-x-4 p-4 text-sm">
-        <button class="bg-black rounded-lg p-2 text-white cursor-pointer" mat-button (click)="onCancel()">
+        <button class="!bg-black rounded-lg p-2 !text-white cursor-pointer" mat-button (click)="onCancel()">
             {{ data.cancelText || 'Cancel' }}
         </button>
-        <button class="bg-red-500 rounded-lg p-2 text-white cursor-pointer" mat-raised-button color="warn"
+        <button class="!bg-red-600 rounded-lg p-2 !text-white cursor-pointer" mat-raised-button color="warn"
             (click)="onConfirm()">
             {{ data.confirmText || 'Confirm' }}
         </button>
