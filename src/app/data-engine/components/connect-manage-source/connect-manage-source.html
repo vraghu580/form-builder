@@ -71,7 +71,10 @@
         <!-- Source Cards -->
         <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
             <div *ngFor="let card of connections"
-                class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow transition">
+                class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow cursor-pointer
+                transition-transform duration-200 ease-out transform hover:scale-[1.01] hover:z-10"     
+                routerLink="/connect-postgresql">
+
                 <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-lg flex items-center justify-center"
                         [ngClass]="card.bgClass || 'bg-gray-100'">
