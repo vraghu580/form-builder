@@ -1,11 +1,11 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { connectionTypeService } from '../../../services/connection-type-service';
 
 type SourceType = 'database' | 'cloud' | 'api' | 'file';
 
 interface Connection {
   name: string;
-  vendor?: string;
+  source?: string;
   kind?: SourceType;
   refreshable?: boolean;
   icon: string;
@@ -13,7 +13,7 @@ interface Connection {
   iconClass?: string;
 }
 
-interface CatalogGroup {
+interface SourceList {
   label: string;
   kind: SourceType | 'all';
   count: number;
@@ -27,42 +27,45 @@ interface CatalogGroup {
 })
 export class ConnectManageSource implements OnInit {
 
-  constructor(private connectionService: connectionTypeService) {}
+  constructor(private connectionService: connectionTypeService) { }
 
-  query = signal('');
-  selectedKind = signal<CatalogGroup['kind']>('all');
-  catalog = signal<Connection[]>([]);
-  connections = signal<Connection[]>([]);
 
-  groups = signal<CatalogGroup[]>([
+  searchsource: string = '';
+  selectedKind: SourceList['kind'] = 'all';
+  connectiondata: Connection[] = [];
+  connections: Connection[] = [];
+
+  groups: SourceList[] = [
     { label: 'All Sources', kind: 'all', count: 0 },
     { label: 'Databases', kind: 'database', count: 0 },
     { label: 'Cloud Services', kind: 'cloud', count: 0 },
     { label: 'APIs', kind: 'api', count: 0 },
     { label: 'Files', kind: 'file', count: 0 },
-  ]);
+  ];
 
   ngOnInit(): void {
     this.loadConnections();
   }
 
+
   loadConnections(): void {
     this.connectionService.getAll().subscribe({
       next: (res: any) => {
-        console.log('✅ API Response:', res);
-        const mappedData: Connection[] = res.map((item: any) => ({
+        console.log('API Response:', res);
+
+        const data: Connection[] = res.map((item: any) => ({
           name: item.displayName || item.name || 'Untitled',
-          vendor: item.connector_type || item.category || 'Unknown',
+          source: item.connector_type || item.category || 'Unknown',
           kind: this.getKindFromCategory(item.category),
-          refreshable: true,
-          icon: this.getIcon(item.category),
-          bgClass: this.getBgClass(item.category),
+          icon: this.iconName(item.category),
+          bgClass: this.iconBgClass(item.category),
           iconClass: 'text-white text-xl'
         }));
 
-        this.catalog.set(mappedData);
-        this.connections.set(mappedData);
-        this.updateGroupCounts(mappedData);
+        this.connectiondata = data;
+        this.connections = data;
+        this.updateGroupCounts(data);
+
       },
       error: (err) => {
         console.error(' Failed to fetch connectors:', err);
@@ -70,68 +73,83 @@ export class ConnectManageSource implements OnInit {
     });
   }
 
-  private getKindFromCategory(category: string): SourceType {
-    switch ((category || '').toLowerCase()) {
-      case 'database': return 'database';
-      case 'cloud': return 'cloud';
-      case 'api': return 'api';
-      case 'file': return 'file';
-      default: return 'database';
-    }
+  getKindFromCategory(category: string = ''): SourceType {
+    const kindMap: Record<string, SourceType> = {
+      database: 'database',
+      cloud: 'cloud',
+      api: 'api',
+      file: 'file'
+    };
+
+    return kindMap[category.toLowerCase()] || 'database';
   }
 
-  private getIcon(category: string): string {
-    switch ((category || '').toLowerCase()) {
-      case 'database': return 'bi bi-database';
-      case 'cloud': return 'bi bi-cloud';
-      case 'api': return 'bi bi-globe2';
-      case 'file': return 'bi bi-file-earmark';
-      default: return 'bi bi-database';
-    }
+  iconName(category: string = ''): string {
+    const iconMap: Record<string, string> = {
+      database: 'bi bi-database',
+      cloud: 'bi bi-cloud',
+      api: 'bi bi-globe2',
+      file: 'bi bi-file-earmark'
+    };
+
+    return iconMap[category.toLowerCase()] || 'bi bi-database';
   }
 
-  private getBgClass(category: string): string {
-    switch ((category || '').toLowerCase()) {
-      case 'database': return 'bg-blue-500';
-      case 'cloud': return 'bg-green-500';
-      case 'api': return 'bg-purple-500';
-      case 'file': return 'bg-orange-500';
-      default: return 'bg-gray-400';
-    }
+  iconBgClass(category: string = ''): string {
+    const bgColorMap: Record<string, string> = {
+      database: 'bg-blue-500',
+      cloud: 'bg-green-500',
+      api: 'bg-purple-500',
+      file: 'bg-orange-500'
+    };
+
+    return bgColorMap[category.toLowerCase()] || 'bg-gray-400';
   }
 
-  private updateGroupCounts(data: Connection[]): void {
-    const allCount = data.length;
-    const dataBaseCount = data.filter(d => d.kind === 'database').length;
-    const cloudCount = data.filter(d => d.kind === 'cloud').length;
-    const apiCount = data.filter(d => d.kind === 'api').length;
-    const fileCount = data.filter(d => d.kind === 'file').length;
+  updateGroupCounts(data: Connection[]): void {
+    const countByKind = {
+      database: 0,
+      cloud: 0,
+      api: 0,
+      file: 0,
+    };
 
-    this.groups.set([
-      { label: 'All Sources', kind: 'all', count: allCount },
-      { label: 'Databases', kind: 'database', count: dataBaseCount },
-      { label: 'Cloud Services', kind: 'cloud', count: cloudCount },
-      { label: 'APIs', kind: 'api', count: apiCount },
-      { label: 'Files', kind: 'file', count: fileCount },
-    ]);
+    data.forEach(item => {
+      if (item.kind && countByKind.hasOwnProperty(item.kind)) {
+        countByKind[item.kind]++;
+      }
+    });
+
+    this.groups = [
+      { label: 'All Sources', kind: 'all', count: data.length },
+      { label: 'Databases', kind: 'database', count: countByKind.database },
+      { label: 'Cloud Services', kind: 'cloud', count: countByKind.cloud },
+      { label: 'APIs', kind: 'api', count: countByKind.api },
+      { label: 'Files', kind: 'file', count: countByKind.file },
+    ];
   }
 
-  selectKind(kind: CatalogGroup['kind']): void {
-    this.selectedKind.set(kind);
+
+  selectKind(kind: SourceList['kind']): void {
+    this.selectedKind = kind;
+    this.filterConnections();
   }
 
-  filteredConnections = computed(() => {
-    const filter = this.query().toLowerCase();
-    const kind = this.selectedKind();
-    return this.catalog().filter(c => {
+  searchFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
+    this.searchsource = filterValue;
+    this.filterConnections();
+  }
+
+
+  filterConnections(): void {
+    const filter = this.searchsource.toLowerCase();
+    const kind = this.selectedKind;
+
+    this.connections = this.connectiondata.filter(c => {
       const matchesKind = kind === 'all' ? true : c.kind === kind;
       const matchesText = !filter || c.name.toLowerCase().includes(filter);
       return matchesKind && matchesText;
     });
-  });
-
-  searchFilter(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    this.query.set(filterValue);
   }
 }

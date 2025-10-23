@@ -5,6 +5,7 @@ import { ConnectManageSource } from './components/connect-manage-source/connect-
 import { DataSchema } from './components/data-schema/data-schema';
 import { DataEngineRoutingModule } from './data-engine-routing-module';
 import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 
 
@@ -17,7 +18,8 @@ import { FormsModule } from '@angular/forms';
   imports: [
     CommonModule,
     DataEngineRoutingModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule
   ]
 })
 export class DataEngineModule { }

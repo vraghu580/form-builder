@@ -5,16 +5,15 @@ import { App } from './app';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MultiStepForm } from './multi-step-form/multi-step-form';
-import { CommonModule } from '@angular/common';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import { Home } from './home/home';
 import { SinglePageForm } from './single-page-form/single-page-form';
-import { MatButtonModule } from '@angular/material/button';
-import { TemplatePreviewDialog } from './dialogs/template-preview-dialog/template-preview-dialog';
 import { HttpClientModule, provideHttpClient } from '@angular/common/http';
+import { TemplatePreviewDialog } from './dialogs/template-preview-dialog/template-preview-dialog';
 import { ConfirmationDialogBox } from './components/confirmation-dialog-box/confirmation-dialog-box';
 import { MatDialogModule } from '@angular/material/dialog';
+import {  MatButtonModule } from '@angular/material/button';
 import { ConnectorTypeMetadataschemaView } from './components/dialog/connector-type-metadataschema-view/connector-type-metadataschema-view';
-import { ConnectorForm } from './connector-type/connector-form/connector-form';
 
 
 
@@ -25,7 +24,10 @@ import { ConnectorForm } from './connector-type/connector-form/connector-form';
     MultiStepForm,
     Home,
     SinglePageForm,
-    ConnectorForm,
+    TemplatePreviewDialog,
+    ConfirmationDialogBox,
+    ConnectorTypeMetadataschemaView
+    
   ],
 
 
@@ -35,7 +37,9 @@ import { ConnectorForm } from './connector-type/connector-form/connector-form';
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
-
+    TitleCasePipe,
+    MatDialogModule,
+    MatButtonModule
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
