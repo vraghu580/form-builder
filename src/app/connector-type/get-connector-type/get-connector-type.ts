@@ -20,6 +20,7 @@ export interface ConnectorType {
     label: string;
     type: string;
     required: boolean;
+    section?: string;
   }>;
 }
 
@@ -69,11 +70,11 @@ export class GetConnectorType implements OnInit {
   }
 
   viewMetadata(metadata: any[]): void {
-  this.dialog.open(ConnectorTypeMetadataschemaView, {
-    width: '500px',
-    data: { metadata },
-  });
-}
+    this.dialog.open(ConnectorTypeMetadataschemaView, {
+      width: '500px',
+      data: { metadata },
+    });
+  }
 
   get metadataSchema(): FormArray {
     return this.connectionForm.get('metadataSchema') as FormArray;
@@ -84,10 +85,13 @@ export class GetConnectorType implements OnInit {
       key: ['', Validators.required],
       label: ['', Validators.required],
       required: [false],
-      type: ['', Validators.required]
+      type: ['', Validators.required],
+      section: [''], 
     });
     this.metadataSchema.push(fieldGroup);
   }
+
+
 
   removeMetadataField(index: number): void {
     this.metadataSchema.removeAt(index);
@@ -113,7 +117,7 @@ export class GetConnectorType implements OnInit {
     this.metadataSchema.clear();
   }
 
-  /** ✅ Cancel create/edit */
+  /**  Cancel create/edit */
   cancelCreate(): void {
     this.showCreateForm = false;
     this.editId = null;
@@ -127,13 +131,13 @@ export class GetConnectorType implements OnInit {
 
     this.connectionService.createConnectionType(newConnector).subscribe({
       next: (res: any) => {
-        console.log('✅ Connector created successfully:', res);
+        console.log(' Connector created successfully:', res);
         this.connectors.push(res);
         this.cancelCreate();
         this.loadConnectors();
       },
       error: (err) => {
-        console.error('❌ Error creating connector:', err);
+        console.error(' Error creating connector:', err);
         alert('Failed to create connector.');
       }
     });
@@ -168,7 +172,7 @@ export class GetConnectorType implements OnInit {
   //           alert('Connector saved successfully!');
   //         },
   //         error: (err) => {
-  //           console.error('❌ Error creating connector:', err);
+  //           console.error(' Error creating connector:', err);
   //           alert('Failed to create connector.');
   //         }
   //       });
@@ -211,7 +215,7 @@ export class GetConnectorType implements OnInit {
 
           },
           error: (err) => {
-            console.error('❌ Error updating connector:', err);
+            console.error(' Error updating connector:', err);
           }
         });
       } else {
@@ -240,11 +244,13 @@ export class GetConnectorType implements OnInit {
             key: [field.key],
             label: [field.label],
             required: [field.required],
-            type: [field.type]
+            type: [field.type],
+            section: [field.section || ''],
           })
         );
       });
     }
+
   }
 
   onDelete(conn: ConnectorType): void {
@@ -266,7 +272,7 @@ export class GetConnectorType implements OnInit {
             this.dataSource.data = this.connectors;
           },
           error: (err) => {
-            console.error('❌ Error deleting connector:', err);
+            console.error(' Error deleting connector:', err);
           }
         });
       } else {

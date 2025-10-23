@@ -8,12 +8,15 @@ import { MultiStepForm } from './multi-step-form/multi-step-form';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { Home } from './home/home';
 import { SinglePageForm } from './single-page-form/single-page-form';
-import { MatButtonModule } from '@angular/material/button';
-import { TemplatePreviewDialog } from './dialogs/template-preview-dialog/template-preview-dialog';
 import { HttpClientModule, provideHttpClient } from '@angular/common/http';
+import { TemplatePreviewDialog } from './dialogs/template-preview-dialog/template-preview-dialog';
 import { ConfirmationDialogBox } from './components/confirmation-dialog-box/confirmation-dialog-box';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
+import {  MatButtonModule } from '@angular/material/button';
 import { ConnectorTypeMetadataschemaView } from './components/dialog/connector-type-metadataschema-view/connector-type-metadataschema-view';
+
+
+import { MatDialog,  } from '@angular/material/dialog';
 import { ConnectToPostgresql } from './connect-to-postgresql/connect-to-postgresql';
 import { ConnectMysql } from './connect-mysql/connect-mysql';
 import { ConnectForm } from './connect-form/connect-form';
