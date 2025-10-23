@@ -51,14 +51,15 @@
                         [class.bg-gray-100]="selectedKind()!==g.kind" [class.text-gray-600]="selectedKind()!==g.kind">{{
                         g.count }}</span>
                         
-                </button> routerLink="connecttopostres "
+                </button>
             </div>
         </div> 
 
 
         <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-            <div *ngFor="let card of filteredConnections()"
-                class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow transition">
+            <div *ngFor="let card of filteredConnections()" routerLink="/connect-postgresql"
+                class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow cursor-pointer
+                transition-transform duration-200 ease-out transform hover:scale-[1.01] hover:z-10">
                 <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-lg flex items-center justify-center"
                         [ngClass]="card.bgClass || 'bg-gray-100'">
