@@ -1,0 +1,45 @@
+<div class="min-h-screen bg-gray-50 p-8 flex justify-center items-start" *ngIf="config">
+  <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-3xl">
+
+    <!-- Header -->
+    <h2 class="text-2xl font-semibold mb-4">
+      Connect to {{ config.databaseType | titlecase }} Database
+    </h2>
+
+    <!-- Tabs -->
+    <div class="flex border-b mb-4">
+      <button *ngFor="let tab of config.tabs"
+              class="px-4 py-2"
+              [ngClass]="{ 'border-b-2 border-blue-600 font-semibold text-blue-600': activeTab === tab.name }"
+              (click)="switchTab(tab.name)">
+        {{ tab.name }}
+      </button>
+    </div>
+
+    <!-- Dynamic Fields -->
+    <form [formGroup]="connectionForm" class="space-y-4">
+      <div *ngFor="let tab of config.tabs" [hidden]="activeTab !== tab.name">
+        <div *ngFor="let field of tab.fields">
+          <label class="block font-medium mb-1">{{ field.label }}</label>
+
+          <input *ngIf="['text','number','password'].includes(field.type)"
+                 [type]="field.type"
+                 [formControlName]="field.key"
+                 class="w-full border rounded-lg px-3 py-2" />
+
+          <input *ngIf="field.type === 'checkbox'"
+                 type="checkbox"
+                 [formControlName]="field.key"
+                 class="h-4 w-4" />
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4 border-t mt-6">
+        <button type="button" class="px-4 py-2 border rounded-lg">Cancel</button>
+        <button type="button" (click)="connect()" class="px-4 py-2 rounded-lg bg-blue-600 text-white">
+          Connect
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

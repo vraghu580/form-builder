@@ -16,6 +16,13 @@ import {  MatButtonModule } from '@angular/material/button';
 import { ConnectorTypeMetadataschemaView } from './components/dialog/connector-type-metadataschema-view/connector-type-metadataschema-view';
 
 
+import { MatDialog,  } from '@angular/material/dialog';
+import { ConnectToPostgresql } from './connect-to-postgresql/connect-to-postgresql';
+import { ConnectMysql } from './connect-mysql/connect-mysql';
+import { ConnectForm } from './connect-form/connect-form';
+import { MatIconModule } from '@angular/material/icon';
+import {  MatSidenavModule } from '@angular/material/sidenav';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 @NgModule({
@@ -24,10 +31,15 @@ import { ConnectorTypeMetadataschemaView } from './components/dialog/connector-t
     MultiStepForm,
     Home,
     SinglePageForm,
-    TemplatePreviewDialog,
-    ConfirmationDialogBox,
-    ConnectorTypeMetadataschemaView
-    
+        TemplatePreviewDialog,
+        ConnectToPostgresql,
+        ConnectMysql,
+        ConfirmationDialogBox,
+        ConnectorTypeMetadataschemaView,
+        ConnectForm
+        
+        
+
   ],
 
 
@@ -37,10 +49,15 @@ import { ConnectorTypeMetadataschemaView } from './components/dialog/connector-t
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
+    MatButtonModule,
+    HttpClientModule,
+    MatDialogModule,
     TitleCasePipe,
     MatDialogModule,
-    MatButtonModule
-  ],
+    MatIconModule,
+    MatSidenavModule,
+    BrowserAnimationsModule
+    ],
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),

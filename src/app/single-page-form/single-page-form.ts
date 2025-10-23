@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { Template } from '../services/template';
-
+import { FormTemplate } from '../services/template';
 
 export interface FormField {
   type: string;
@@ -32,19 +32,16 @@ export interface FormStructure {
   selector: 'app-single-page-form',
   standalone: false,
   templateUrl: './single-page-form.html',
-  styleUrl: './single-page-form.scss'
+  styleUrls: ['./single-page-form.scss']
 })
 export class SinglePageForm {
   activeFields: any[] = [];
   selectedFieldIndex: number | null = null;
-
   isValidationEnabled = false;
   selectedTab: 'field-types' | 'attribute' = 'field-types';
-
   formTitle: string = 'Form Title';
   formDescription: string = 'Form description goes here';
   formType: string = 'Single Page Form';
-
   selectedFormProperty: 'title' | 'description' | null = null;
 
   fieldTypes: FormField[] = [
@@ -64,29 +61,28 @@ export class SinglePageForm {
     { icon: 'bi-calculator', attributeName: 'Composite Attribute', attributeDiscription: 'Complex structure (address, name)' }
   ];
 
+  previewMode: 'phone' | 'tablet' | 'desktop' = 'desktop';
+
   constructor(private templateService: Template, private router: Router) { }
 
   ngOnInit() {
     const selectedTemplate = this.templateService.getTemplate();
-
     if (selectedTemplate) {
       this.formTitle = selectedTemplate.title || 'Form Title';
       this.formDescription = selectedTemplate.description || 'Form description goes here';
-      // this.formType = selectedTemplate.type || 'unknown';   
-
       if (selectedTemplate.fields && selectedTemplate.fields.length > 0) {
         this.activeFields = selectedTemplate.fields.map((field: any) => ({
-          label: field.label,
+          label: field.label || field.name,
           type: field.type,
-          placeholder: field.label,
-          value: '',
-          required: false,
-          options: []
+          placeholder: field.placeholder || field.label || '',
+          value: field.value || '',
+          required: field.required || false,
+          options: field.options || [],
+          selectedOptions: field.selectedOptions || {}
         }));
       }
     }
   }
-
 
   setTab(tab: 'field-types' | 'attribute') {
     this.selectedTab = tab;
@@ -121,8 +117,6 @@ export class SinglePageForm {
     this.selectedFieldIndex = null;
   }
 
-  previewMode: 'phone' | 'tablet' | 'desktop' = 'desktop';
-
   setPreview(mode: 'phone' | 'tablet' | 'desktop') {
     this.previewMode = mode;
   }
@@ -132,10 +126,6 @@ export class SinglePageForm {
       this.activeFields[this.selectedFieldIndex].required =
         !this.activeFields[this.selectedFieldIndex].required;
     }
-  }
-
-  trackByIndex(index: number, item: any) {
-    return index;
   }
 
   addOption() {
@@ -154,15 +144,41 @@ export class SinglePageForm {
     }
   }
 
-  saveForm() {
-    const formStructure: FormStructure = {
-      formType: this.formType,
-      title: this.formTitle,
-      description: this.formDescription,
-      fields: this.activeFields,
+saveForm() {
+  const formStructure = {
+    formType: this.formType,
+    title: this.formTitle,
+    description: this.formDescription,
+    fields: this.activeFields,
+  };
+
+  const currentTemplate = this.templateService.getTemplate();
+
+  if (currentTemplate?.isEditMode) {
+    const updatedTemplate: any = {
+      ...currentTemplate,
+      ...formStructure,
+      type: 'single-page',
+      id: currentTemplate.id
     };
-    console.log('💾 Form Structure:', JSON.stringify(formStructure, null, 2));
+
+    // ✅ Correct method for update
+    this.templateService.updateTemplate(updatedTemplate);
+    alert('✅ Template updated successfully!');
+  } else {
+    const newTemplate: any = {
+      ...formStructure,
+      id: Date.now(),
+      type: 'single-page'
+    };
+
+    // ✅ Correct method for adding new
+    this.templateService.updateTemplate(newTemplate);
+    alert('✅ New template saved successfully!');
   }
+
+  this.router.navigate(['/formtemplates']);
+}
 
   submitForm() {
     const submittedData: any = {};
@@ -175,5 +191,9 @@ export class SinglePageForm {
       }
     });
     console.log('✅ Form Submitted Data:', submittedData);
+  }
+
+  trackByIndex(index: number, item: any) {
+    return index;
   }
 }

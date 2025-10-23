@@ -1,0 +1,97 @@
+<div class="min-h-screen bg-gray-50 p-8 flex justify-center items-start">
+  <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-3xl">
+    <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+      <span class="text-orange-500 text-3xl"></span> Connect to MySQL <span class="text-gray-500 text-sm ml-2">database</span>
+    </h2>
+
+    <!-- Tabs -->
+    <div class="flex border-b mb-4">
+      <button
+        class="px-4 py-2"
+        [ngClass]="{ 'border-b-2 border-blue-600 font-semibold text-blue-600': activeTab === 'basic' }"
+        (click)="switchTab('basic')">
+        Basic Settings
+      </button>
+      <button
+        class="px-4 py-2"
+        [ngClass]="{ 'border-b-2 border-blue-600 font-semibold text-blue-600': activeTab === 'auth' }"
+        (click)="switchTab('auth')">
+        Authentication
+      </button>
+      <button
+        class="px-4 py-2"
+        [ngClass]="{ 'border-b-2 border-blue-600 font-semibold text-blue-600': activeTab === 'advanced' }"
+        (click)="switchTab('advanced')">
+        Advanced
+      </button>
+    </div>
+
+    <form [formGroup]="connectionForm" class="space-y-4">
+      <!-- BASIC SETTINGS TAB -->
+      <div *ngIf="activeTab === 'basic'">
+        <div>
+          <label class="block font-medium mb-1">Connection Name *</label>
+          <input formControlName="connectionName" class="w-full border rounded-lg px-3 py-2" placeholder="e.g. Production MySQL" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block font-medium mb-1">Host/Server *</label>
+            <input formControlName="host" class="w-full border rounded-lg px-3 py-2" placeholder="localhost or IP address" />
+          </div>
+          <div>
+            <label class="block font-medium mb-1">Port *</label>
+            <input formControlName="port" type="number" class="w-full border rounded-lg px-3 py-2" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-medium mb-1">Database Name *</label>
+          <input formControlName="database" class="w-full border rounded-lg px-3 py-2" placeholder="database_name" />
+        </div>
+
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label class="block font-medium mb-1">Min Connections</label>
+            <input formControlName="minConnections" type="number" class="w-full border rounded-lg px-3 py-2" />
+          </div>
+          <div>
+            <label class="block font-medium mb-1">Max Connections</label>
+            <input formControlName="maxConnections" type="number" class="w-full border rounded-lg px-3 py-2" />
+          </div>
+          <div>
+            <label class="block font-medium mb-1">Timeout (seconds)</label>
+            <input formControlName="timeout" type="number" class="w-full border rounded-lg px-3 py-2" />
+          </div>
+        </div>
+      </div>
+
+      <!-- AUTH TAB -->
+      <div *ngIf="activeTab === 'auth'">
+        <div>
+          <label class="block font-medium mb-1">Username</label>
+          <input formControlName="username" class="w-full border rounded-lg px-3 py-2" />
+        </div>
+        <div>
+          <label class="block font-medium mb-1">Password</label>
+          <input formControlName="password" type="password" class="w-full border rounded-lg px-3 py-2" />
+        </div>
+      </div>
+
+      <!-- ADVANCED TAB -->
+      <div *ngIf="activeTab === 'advanced'">
+        <div class="flex items-center gap-2">
+          <input id="ssl" formControlName="ssl" type="checkbox" class="h-4 w-4" />
+          <label for="ssl" class="font-medium">Enable SSL Connection</label>
+        </div>
+      </div>
+
+      <!-- ACTION BUTTONS -->
+      <div class="flex justify-end gap-3 pt-4 border-t mt-6">
+        <button type="button" (click)="cancel()" class="px-4 py-2 border rounded-lg">Cancel</button>
+        <button type="button" (click)="testConnection()" class="px-4 py-2 border rounded-lg bg-gray-100">Test Connection</button>
+        <button type="button" (click)="connect()" class="px-4 py-2 rounded-lg bg-blue-600 text-white">Connect</button>
+      </div>
+    </form>
+  </div>
+</div>
