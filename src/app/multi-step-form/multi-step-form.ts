@@ -219,7 +219,6 @@ export class MultiStepForm {
       id: currentTemplate.id
     };
 
-    // ✅ Correct method for update
     this.templateService.updateTemplate(updatedTemplate);
     alert('✅ Template updated successfully!');
   } else {
@@ -229,7 +228,6 @@ export class MultiStepForm {
       type: 'multi-page'
     };
 
-    // ✅ Correct method for adding new
     this.templateService.updateTemplate(newTemplate);
     alert('✅ New template saved successfully!');
   }

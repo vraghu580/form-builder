@@ -1,5 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { CommonModule, TitleCasePipe } from '@angular/common';
+
 
 @Component({
   selector: 'app-template-preview-dialog',

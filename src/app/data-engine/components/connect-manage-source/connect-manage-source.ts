@@ -134,4 +134,6 @@ export class ConnectManageSource implements OnInit {
     const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
     this.query.set(filterValue);
   }
+
+  
 }

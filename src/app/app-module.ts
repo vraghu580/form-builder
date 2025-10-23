@@ -5,18 +5,18 @@ import { App } from './app';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MultiStepForm } from './multi-step-form/multi-step-form';
-import { CommonModule } from '@angular/common';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import { Home } from './home/home';
 import { SinglePageForm } from './single-page-form/single-page-form';
 import { MatButtonModule } from '@angular/material/button';
 import { TemplatePreviewDialog } from './dialogs/template-preview-dialog/template-preview-dialog';
 import { HttpClientModule, provideHttpClient } from '@angular/common/http';
 import { ConfirmationDialogBox } from './components/confirmation-dialog-box/confirmation-dialog-box';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConnectorTypeMetadataschemaView } from './components/dialog/connector-type-metadataschema-view/connector-type-metadataschema-view';
-import { ConnectorForm } from './connector-type/connector-form/connector-form';
-
-
+import { ConnectToPostgresql } from './connect-to-postgresql/connect-to-postgresql';
+import { ConnectMysql } from './connect-mysql/connect-mysql';
+import { ConnectForm } from './connect-form/connect-form';
 
 
 @NgModule({
@@ -25,7 +25,15 @@ import { ConnectorForm } from './connector-type/connector-form/connector-form';
     MultiStepForm,
     Home,
     SinglePageForm,
-    ConnectorForm,
+        TemplatePreviewDialog,
+        ConnectToPostgresql,
+        ConnectMysql,
+        ConfirmationDialogBox,
+        ConnectorTypeMetadataschemaView,
+        ConnectForm
+        
+        
+
   ],
 
 
@@ -35,8 +43,12 @@ import { ConnectorForm } from './connector-type/connector-form/connector-form';
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
-
-  ],
+    MatButtonModule,
+    HttpClientModule,
+    MatDialogModule,
+    TitleCasePipe,
+    MatDialogModule
+    ],
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),

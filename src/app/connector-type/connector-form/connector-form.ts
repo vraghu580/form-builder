@@ -52,6 +52,6 @@ export class ConnectorForm {
       })
     } else {
       alert('Please fill all required fields')
-    }
-  }
+    }
+  }
 }

@@ -45,14 +45,15 @@
                " [class.bg-gray-900]="selectedKind()===g.kind" [class.text-white]="selectedKind()===g.kind"
                     [class.border-gray-900]="selectedKind()===g.kind" [class.bg-white]="selectedKind()!==g.kind"
                     [class.text-gray-700]="selectedKind()!==g.kind" [class.border-gray-200]="selectedKind()!==g.kind">
-                    {{ g.label }}
+                    {{ g.label }} 
                     <span class="ml-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full px-2 text-xs"
                         [class.bg-white]="selectedKind()===g.kind" [class.text-gray-900]="selectedKind()===g.kind"
                         [class.bg-gray-100]="selectedKind()!==g.kind" [class.text-gray-600]="selectedKind()!==g.kind">{{
                         g.count }}</span>
-                </button>
+                        
+                </button> routerLink="connecttopostres "
             </div>
-        </div>
+        </div> 
 
 
         <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
