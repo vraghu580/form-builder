@@ -2,7 +2,7 @@ import { NgModule, provideBrowserGlobalErrorListeners, provideZonelessChangeDete
 import { CommonModule } from '@angular/common';
 import { ConnectorTypeRoutingModule } from './connector-type-routing-module';
 import { ConnectorForm } from './connector-form/connector-form';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
 import { GetConnectorType } from './get-connector-type/get-connector-type';
 import { EditConnectorType } from './edit-connector-type/edit-connector-type';
@@ -28,7 +28,10 @@ import { MatSortModule } from '@angular/material/sort';
    MatTableModule,
    MatButtonModule ,
    MatPaginatorModule,
-   MatSortModule
+   MatSortModule,
+   HttpClientModule,
+   FormsModule,
+   
   ],
    providers: [
     provideHttpClient((withFetch())),

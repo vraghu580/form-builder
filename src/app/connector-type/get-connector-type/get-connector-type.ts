@@ -233,7 +233,7 @@ export class GetConnectorType implements OnInit {
       name: conn.name,
       displayName: conn.displayName,
       category: conn.category,
-      connector_type: conn.connector_type
+      description: conn.description
     });
 
     this.metadataSchema.clear();
