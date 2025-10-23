@@ -17,6 +17,9 @@ import { ConnectorTypeMetadataschemaView } from './components/dialog/connector-t
 import { ConnectToPostgresql } from './connect-to-postgresql/connect-to-postgresql';
 import { ConnectMysql } from './connect-mysql/connect-mysql';
 import { ConnectForm } from './connect-form/connect-form';
+import { MatIconModule } from '@angular/material/icon';
+import {  MatSidenavModule } from '@angular/material/sidenav';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 @NgModule({
@@ -47,7 +50,10 @@ import { ConnectForm } from './connect-form/connect-form';
     HttpClientModule,
     MatDialogModule,
     TitleCasePipe,
-    MatDialogModule
+    MatDialogModule,
+    MatIconModule,
+    MatSidenavModule,
+    BrowserAnimationsModule
     ],
   providers: [
     provideBrowserGlobalErrorListeners(),

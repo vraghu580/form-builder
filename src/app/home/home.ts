@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
   styleUrl: './home.scss'
 })
 export class Home {
+  isOpen = true;
    forms = [  
 
     {
@@ -43,4 +44,7 @@ navigateToForm(route: any){
   this.router.navigate([route])
 }
 
+ toggleSidenav(): void {
+    this.isOpen = !this.isOpen;
+  }
 }
