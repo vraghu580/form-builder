@@ -1,1 +1,32 @@
-<p>data-schema works!</p>
+<div class="min-h-screen bg-gray-50 p-8 flex justify-center items-start">
+  <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-5xl">
+
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-semibold text-gray-800">Database Schema</h2>
+      <button (click)="backToConnection()" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100">
+        ← Back
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="text-center text-gray-500 py-10">
+      Fetching database schema...
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!loading && errorMsg" class="text-red-600 text-center font-medium py-4">
+      {{ errorMsg }}
+    </div>
+
+    <!-- Schema Data -->
+    <div *ngIf="!loading && schemaData.length > 0">
+      <div *ngFor="let table of schemaData" class="border rounded-lg mb-4 shadow-sm p-4 bg-gray-50">
+        <h3 class="text-lg font-semibold text-blue-700 mb-2">{{ table.table }}</h3>
+        <ul class="list-disc pl-6 text-gray-700">
+          <li *ngFor="let col of table.columns">{{ col }}</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>

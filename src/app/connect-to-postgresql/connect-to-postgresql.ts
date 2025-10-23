@@ -1,147 +1,130 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
-type AuthMethod = 'usernamePassword' | 'windows' | 'sslCert' | 'kerberos';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-connect-to-postgresql',
- 
   standalone: false,
   templateUrl: './connect-to-postgresql.html',
-  styleUrls: ['./connect-to-postgresql.scss'] 
+  styleUrls: ['./connect-to-postgresql.scss']
 })
-export class ConnectToPostgresql {
-  connectionForm: FormGroup;
+export class ConnectToPostgresql implements OnInit {
+
+  connectionForm!: FormGroup;
+  metadataFields: any[] = [];
   activeTab: string = 'basic';
-  passwordVisible = false;
+  loading: boolean = true;
+  connectionStatus: 'idle' | 'testing' | 'success' | 'failed' = 'idle';
 
-  constructor(private fb: FormBuilder) {
-    this.connectionForm = this.fb.group({
-      connectionName: ['', Validators.required],
-      host: ['', Validators.required],
-      port: [5432, [Validators.required, Validators.min(1)]],
-      database: ['', Validators.required],
-      minConnections: [1, [Validators.min(0)]],
-      maxConnections: [10, [Validators.min(1)]],
-      timeout: [30, [Validators.min(0)]],
-      ssl: [false],
+  constructor(private fb: FormBuilder, private http: HttpClient, private router: Router) {}
 
-      auth: this.fb.group({
-        method: ['usernamePassword', Validators.required],
-
-        
-        username: [''],
-        password: [''],
-
-        
-        domain: [''],
-
-        
-        sslMode: ['prefer'],
-        clientCert: [null],
-        clientKey: [null],
-        clientCA: [null],
-
-        
-        principal: [''],
-        serviceName: ['postgres'],
-        keytab: [null]
-      })
-    });
-
-    this.setupAuthValidation();
+  ngOnInit(): void {
+    this.loadMetadata();
   }
 
-  get authGroup(): FormGroup {
-    return this.connectionForm.get('auth') as FormGroup;
-  }
+  // Get metadata
+  loadMetadata() {
+    this.http.get<any[]>('http://3.6.68.94/services/form-builder/connector-types').subscribe({
+      next: (response) => {
+        const postgresConnector = response.find(
+          (item) => item.name?.toLowerCase() === 'postgres' || item.displayName?.toLowerCase().includes('postgres')
+        );
+        console.log('Postgres Connector:', postgresConnector);
 
-  get authMethod(): AuthMethod {
-    return this.authGroup.get('method')?.value as AuthMethod;
-  }
+        if (postgresConnector && postgresConnector.id) {
+          const connectorId = postgresConnector.id;
 
-  private setupAuthValidation() {
-    const methodCtrl = this.authGroup.get('method')!;
-    methodCtrl.valueChanges.subscribe((m: AuthMethod) => this.applyAuthValidators(m));
-    this.applyAuthValidators(methodCtrl.value as AuthMethod);
-  }
-
-  private applyAuthValidators(method: AuthMethod) {
-    // Clear all validators first
-    const clear = (name: string) => {
-      const c = this.authGroup.get(name)!;
-      c.clearValidators();
-      c.updateValueAndValidity({ emitEvent: false });
-    };
-
-    ['username','password','domain','sslMode','clientCert','clientKey','clientCA','principal','serviceName','keytab'].forEach(clear);
-
-    // Apply per-method
-    if (method === 'usernamePassword') {
-      this.authGroup.get('username')!.setValidators([Validators.required]);
-      this.authGroup.get('password')!.setValidators([Validators.required]);
-    }
-
-    if (method === 'windows') {
-      this.authGroup.get('domain')!.setValidators([Validators.required]);
-    }
-
-    if (method === 'sslCert') {
-      this.authGroup.get('sslMode')!.setValidators([Validators.required]);
-      this.authGroup.get('clientCert')!.setValidators([Validators.required]);
-      this.authGroup.get('clientKey')!.setValidators([Validators.required]);
-      this.authGroup.get('clientCA')!.setValidators([Validators.required]);
-      this.connectionForm.get('ssl')!.setValue(true, { emitEvent: false });
-    }
-
-    if (method === 'kerberos') {
-      this.authGroup.get('principal')!.setValidators([Validators.required]);
-      this.authGroup.get('serviceName')!.setValidators([Validators.required]);
-    }
-
-    // Update after setting
-    Object.keys(this.authGroup.controls).forEach(k => {
-      this.authGroup.get(k)!.updateValueAndValidity({ emitEvent: false });
+          this.http.get<any>(`http://3.6.68.94/services/form-builder/connector-types/${connectorId}`).subscribe({
+            next: (res) => {
+              this.metadataFields = res.metadataSchema || [];
+              this.createForm();
+              this.loading = false;
+            },
+            error: () => (this.loading = false)
+          });
+        } else {
+          this.loading = false;
+        }
+      },
+      error: () => (this.loading = false)
     });
   }
 
-  onFileSelected(evt: Event, control: 'clientCert'|'clientKey'|'clientCA'|'keytab') {
-    const file = (evt.target as HTMLInputElement).files?.[0] ?? null;
-    this.authGroup.get(control)!.setValue(file);
-    this.authGroup.get(control)!.markAsDirty();
+  createForm() {
+    const formGroup: any = {};
+    this.metadataFields.forEach((field) => {
+      formGroup[field.key] = ['', field.required ? Validators.required : []];
+    });
+    this.connectionForm = this.fb.group(formGroup);
   }
 
-  switchTab(tab: string) {
-    this.activeTab = tab;
-  }
-
-  testConnection() {
-    if (this.connectionForm.invalid) {
-      alert('Please fill all required fields');
-      return;
+  getFieldsByTab(tabName: string) {
+    if (tabName === 'basic') {
+      return this.metadataFields.filter((f) => !f.tab || f.tab.toLowerCase() === 'basic');
     }
-    // Replace with real API call
-    alert('Testing connection...');
+    return this.metadataFields.filter((f) => f.tab && f.tab.toLowerCase() === tabName.toLowerCase());
   }
+
+  getInputType(type: string) {
+    if (type === 'password') return 'password';
+    if (type === 'number') return 'number';
+    return 'text';
+  }
+
+  switchTab(tabName: string) {
+    this.activeTab = tabName;
+  }
+
+testConnection() {
+  if (this.connectionForm.invalid) {
+    alert('Please fill all required fields');
+    return;
+  }
+
+  this.connectionStatus = 'testing';
+
+  const payload = {
+    type: 'postgres', 
+    config: this.connectionForm.value
+  }; 
+  console.log('Testing connection with payload);', payload);
+
+  this.http.post<any>('http://3.6.68.94/services/form-builder/connector-instances/test', payload)
+    .subscribe({
+      next: (res) => {
+        console.log('✅ API Response:', res);
+
+        // backend should return { success: true } or similar
+        if (res.success) {
+          this.connectionStatus = 'success';
+          alert('✅ Connection Successful!');
+        } else {
+          this.connectionStatus = 'failed';
+          alert('❌ Connection Failed. Please check your details.');
+        }
+      },
+      error: (err) => {
+        console.error('❌ Connection test failed:', err);
+        this.connectionStatus = 'failed';
+        alert('❌ Connection Failed. Please check your details.');
+      }
+    });
+}
 
   connect() {
-    if (this.connectionForm.invalid) {
-      alert('Please fill all required fields');
+    if (this.connectionStatus !== 'success') {
+      alert('Please test the connection first before connecting.');
       return;
     }
-    console.log('Form Data:', this.connectionForm.value);
-    alert('Connected successfully (simulation)');
+
+    console.log('Connection confirmed. Proceeding to next step...');
+    // Navigate to schema page
+    this.router.navigate(['/data-engine/schema']);
   }
 
   cancel() {
-    this.connectionForm.reset({
-      port: 5432,
-      minConnections: 1,
-      maxConnections: 10,
-      timeout: 30,
-      ssl: false,
-      auth: { method: 'usernamePassword', serviceName: 'postgres', sslMode: 'prefer' }
-    });
-    this.passwordVisible = false;
+    this.connectionForm.reset();
+    this.connectionStatus = 'idle';
   }
 }
