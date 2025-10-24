@@ -14,7 +14,6 @@ export interface ConnectorType {
   displayName: string;
   category: string;
   description?: string;
-  connector_type?: string;
   metadataSchema?: Array<{
     key: string;
     label: string;
@@ -232,7 +231,7 @@ export class GetConnectorType implements OnInit {
       name: conn.name,
       displayName: conn.displayName,
       category: conn.category,
-      connector_type: conn.connector_type
+      description: conn.description
     });
 
     this.metadataSchema.clear();
