@@ -23,6 +23,7 @@ import { ConnectForm } from './connect-form/connect-form';
 import { MatIconModule } from '@angular/material/icon';
 import {  MatSidenavModule } from '@angular/material/sidenav';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Header } from './components/header/header';
 
 
 @NgModule({
@@ -36,7 +37,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
         ConnectMysql,
         ConfirmationDialogBox,
         ConnectorTypeMetadataschemaView,
-        ConnectForm
+        ConnectForm,
+        Header
         
         
 

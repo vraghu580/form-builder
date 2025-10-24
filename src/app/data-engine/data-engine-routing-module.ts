@@ -8,13 +8,24 @@ const routes: Routes = [
 
   {
     path: '', component: DataEngineMain,
+     data:{
+        title:'Data Engine',
+        icon:'bi bi-database-fill',
+      },
     children: [
       { path: '', redirectTo: 'grievance-queue', pathMatch: 'full' },
-      { path: 'connect-manage', component: ConnectManageSource },
-      { path: 'data-schema', component: DataSchema },
-
-
-
+      { path: 'connect-manage', component: ConnectManageSource,
+         data:{
+        title:'Data Engine',
+        icon:'bi bi-database-fill',
+      },
+       },
+      { path: 'data-schema', component: DataSchema,
+         data:{
+        title:'DataEngine',
+        icon:'bi bi-database-fill',
+      },
+       },
     ]
   },
 ];

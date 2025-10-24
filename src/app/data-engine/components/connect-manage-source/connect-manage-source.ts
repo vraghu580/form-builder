@@ -152,8 +152,8 @@ loadConnections(): void {
     });
   }
 
-  goToConnection(card: any) {
-    // Navigate with route parameter
-    this.router.navigate(['/connect', card.name]);
+   goToConnector(card: any){
+    this.router.navigate(['/connect-postgresql', card.name])
+
   }
 }
