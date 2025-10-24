@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-connect-to-postgresql',
@@ -16,11 +16,14 @@ export class ConnectToPostgresql implements OnInit {
   activeTab: string = 'basic';
   loading: boolean = true;
   connectionStatus: 'idle' | 'testing' | 'success' | 'failed' = 'idle';
+  connectionName: string ='';
 
-  constructor(private fb: FormBuilder, private http: HttpClient, private router: Router) {}
+  constructor(private fb: FormBuilder, private http: HttpClient, private router: Router, private route:ActivatedRoute) {}
 
   ngOnInit(): void {
     this.loadMetadata();
+        this.connectionName = this.route.snapshot.paramMap.get('name') || 'Unknown';
+
   }
 
   // Get metadata
@@ -127,4 +130,6 @@ testConnection() {
     this.connectionForm.reset();
     this.connectionStatus = 'idle';
   }
+
+ 
 }

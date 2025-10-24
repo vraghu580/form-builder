@@ -6,7 +6,12 @@ import { EditConnectorType } from './edit-connector-type/edit-connector-type';
 
 const routes: Routes = [
   // {path: 'connector-form', component: ConnectorForm},
-  {path: 'connector-get', component: GetConnectorType},
+  {path: 'connector-get', component: GetConnectorType,
+     data:{
+        title:'Connector Types',
+        icon:'bi bi-filetype-tsx',
+      },
+   },
   {path: 'Connector-edit', component: EditConnectorType},
 ];
 

@@ -1,0 +1,24 @@
+<header class="bg-white border-b border-slate-200 shadow-sm shadow-gray-200">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex items-center justify-between max-[550px]:flex-col gap-3">
+            <div class="flex items-center space-x-4 max-[550px]:flex-col">
+                <button
+                    class="flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium border border-gray-200 bg-background  h-9 rounded-md px-3 cursor-pointer hover:bg-gray-100 max-[550px]:hidden"
+                    (click)="goBack()">
+                    <div><i class="bi bi-arrow-left size-4 mr-2"></i></div>
+                    <div>Back</div>
+                </button>
+                <div class="bg-slate-300 w-px h-6 max-[550px]:hidden"></div>
+                <div class="bg-blue-600 py-1.5 px-2.5 rounded-lg"><i class="{{icon}} text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900">{{title}}</h1>
+                    <p class="text-sm text-slate-600">{{description}}</p>
+                </div>
+            </div>
+            <div class="flex justify-between gap-5">
+
+            </div>
+        </div>
+    </div>
+</header>

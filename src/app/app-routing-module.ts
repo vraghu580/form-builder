@@ -9,12 +9,27 @@ import { ConnectToPostgresql } from './connect-to-postgresql/connect-to-postgres
 import { ConnectForm } from './connect-form/connect-form';
 
 const routes: Routes = [
-  { path: 'home', component: Home },
+  { path: 'home', component: Home,
+    data:{
+        title:'Choose Template Form',
+        icon:'bi bi-ui-checks-grid',
+      },
+   },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'single-form/:id', component: SinglePageForm },
-  { path: 'multi-form/:id', component: MultiStepForm },
+  { path: 'single-form/:id', component: SinglePageForm,
+     data:{
+        title:'Single Page Form',
+        icon:'bi bi-ui-checks-grid',
+      },
+   },
+  { path: 'multi-form/:id', component: MultiStepForm,
+     data:{
+        title:'Multi Step Form',
+        icon:'bi bi-ui-checks-grid',
+      },
+   },
   {path:'connect-mysql',component:ConnectMysql},
-  {path:'connect-postgresql',component:ConnectToPostgresql},
+  {path:'connect-postgresql/:name',component:ConnectToPostgresql},
 {path:'connect-form',component:ConnectForm},
 
 
