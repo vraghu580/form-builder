@@ -1,5 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { connectionTypeService } from '../../../services/connection-type-service';
+import { Router } from '@angular/router';
 
 type SourceType = 'database' | 'cloud' | 'api' | 'file';
 
@@ -27,7 +28,7 @@ interface SourceList {
 })
 export class ConnectManageSource implements OnInit {
 
-  constructor(private connectionService: connectionTypeService, private cdr: ChangeDetectorRef) { }
+  constructor(private connectionService: connectionTypeService, private cdr: ChangeDetectorRef, private router: Router) { }
 
 
   searchsource: string = '';
@@ -149,5 +150,10 @@ loadConnections(): void {
       const matchesText = !filter || c.name.toLowerCase().includes(filter);
       return matchesKind && matchesText;
     });
+  }
+
+  goToConnection(card: any) {
+    // Navigate with route parameter
+    this.router.navigate(['/connect', card.name]);
   }
 }

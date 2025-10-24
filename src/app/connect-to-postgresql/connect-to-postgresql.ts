@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-connect-to-postgresql',
@@ -16,38 +16,61 @@ export class ConnectToPostgresql implements OnInit {
   activeTab: string = 'basic';
   loading: boolean = true;
   connectionStatus: 'idle' | 'testing' | 'success' | 'failed' = 'idle';
+  connectorTypeId: string = ''; 
+  connectToName: string = '';
 
-  constructor(private fb: FormBuilder, private http: HttpClient, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private router: Router,
+    private route: ActivatedRoute,
+  ) {}
 
   ngOnInit(): void {
     this.loadMetadata();
+    this.connectToName = this.route.snapshot.paramMap.get('name') || 'Unknown';
   }
 
-  // Get metadata
+  // ✅ STEP 1: Load metadata and store connectorTypeId
   loadMetadata() {
-    this.http.get<any[]>('http://3.6.68.94/services/form-builder/connector-types').subscribe({
+    this.http.get<any[]>('http://3.6.68.94/services/form-builder/connector-instances').subscribe({
       next: (response) => {
         const postgresConnector = response.find(
-          (item) => item.name?.toLowerCase() === 'postgres' || item.displayName?.toLowerCase().includes('postgres')
+          (item) =>
+            item.name?.toLowerCase() === 'postgres' ||
+            item.displayName?.toLowerCase().includes('postgres')
         );
-        console.log('Postgres Connector:', postgresConnector);
 
-        if (postgresConnector && postgresConnector.id) {
-          const connectorId = postgresConnector.id;
+        if (postgresConnector?.id) {
+          this.connectorTypeId = this.connectorTypeId
+          console.log('✅ Connector Type ID:', this.connectorTypeId);
 
-          this.http.get<any>(`http://3.6.68.94/services/form-builder/connector-types/${connectorId}`).subscribe({
-            next: (res) => {
-              this.metadataFields = res.metadataSchema || [];
-              this.createForm();
-              this.loading = false;
-            },
-            error: () => (this.loading = false)
-          });
+          // fetch schema for the form fields
+          this.http
+            .get<any>(
+              `http://3.6.68.94/services/form-builder/connector-instances/${this.connectorTypeId}`
+            )
+            .subscribe({
+              next: (res) => {
+                this.metadataFields = res.metadataSchema || [];
+                console.log('✅ Loaded metadata schema:', this.metadataFields);
+                this.createForm();
+                this.loading = false;
+              },
+              error: (err) => {
+                console.error('❌ Failed to load metadata details:', err);
+                this.loading = false;
+              },
+            });
         } else {
+          console.error('❌ Postgres connector not found in connector-types response');
           this.loading = false;
         }
       },
-      error: () => (this.loading = false)
+      error: (err) => {
+        console.error('❌ Failed to fetch connector types:', err);
+        this.loading = false;
+      },
     });
   }
 
@@ -61,9 +84,13 @@ export class ConnectToPostgresql implements OnInit {
 
   getFieldsByTab(tabName: string) {
     if (tabName === 'basic') {
-      return this.metadataFields.filter((f) => !f.tab || f.tab.toLowerCase() === 'basic');
+      return this.metadataFields.filter(
+        (f) => !f.tab || f.tab.toLowerCase() === 'basic'
+      );
     }
-    return this.metadataFields.filter((f) => f.tab && f.tab.toLowerCase() === tabName.toLowerCase());
+    return this.metadataFields.filter(
+      (f) => f.tab && f.tab.toLowerCase() === tabName.toLowerCase()
+    );
   }
 
   getInputType(type: string) {
@@ -76,26 +103,37 @@ export class ConnectToPostgresql implements OnInit {
     this.activeTab = tabName;
   }
 
-testConnection() {
+  // ✅ STEP 2: Test Connection
+  testConnection() {
   if (this.connectionForm.invalid) {
     alert('Please fill all required fields');
     return;
   }
 
+  // use the correct connectorTypeId that works in Postman
+  const correctConnectorTypeId = 'f9c75b5c-a9b2-4459-9532-f39d966bfb7d'; 
+
   this.connectionStatus = 'testing';
 
   const payload = {
-    type: 'postgres', 
-    config: this.connectionForm.value
-  }; 
-  console.log('Testing connection with payload);', payload);
+    connectorTypeId: correctConnectorTypeId,
+    name: 'postgres',
+    createdBy: 'admin',
+    config: {
+      host: this.connectionForm.value.host,
+      port: this.connectionForm.value.port,
+      user: this.connectionForm.value.user,
+      password: this.connectionForm.value.password,
+      database: this.connectionForm.value.database
+    }
+  };
+
+  console.log('🧩 Sending payload:', payload);
 
   this.http.post<any>('http://3.6.68.94/services/form-builder/connector-instances/test', payload)
     .subscribe({
       next: (res) => {
         console.log('✅ API Response:', res);
-
-        // backend should return { success: true } or similar
         if (res.success) {
           this.connectionStatus = 'success';
           alert('✅ Connection Successful!');
@@ -112,6 +150,7 @@ testConnection() {
     });
 }
 
+
   connect() {
     if (this.connectionStatus !== 'success') {
       alert('Please test the connection first before connecting.');
@@ -119,7 +158,6 @@ testConnection() {
     }
 
     console.log('Connection confirmed. Proceeding to next step...');
-    // Navigate to schema page
     this.router.navigate(['/data-engine/schema']);
   }
 

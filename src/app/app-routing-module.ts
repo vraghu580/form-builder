@@ -14,7 +14,7 @@ const routes: Routes = [
   { path: 'single-form/:id', component: SinglePageForm },
   { path: 'multi-form/:id', component: MultiStepForm },
   {path:'connect-mysql',component:ConnectMysql},
-  {path:'connect-postgresql',component:ConnectToPostgresql},
+  {path:'connect/:name',component:ConnectToPostgresql},
 {path:'connect-form',component:ConnectForm},
 
 
