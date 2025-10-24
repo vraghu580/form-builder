@@ -117,7 +117,6 @@ export class GetConnectorType implements OnInit {
     this.metadataSchema.clear();
   }
 
-  /**  Cancel create/edit */
   cancelCreate(): void {
     this.showCreateForm = false;
     this.editId = null;
@@ -165,7 +164,7 @@ export class GetConnectorType implements OnInit {
 
   //       this.connectionService.createConnectionType(newConnector).subscribe({
   //         next: (res: any) => {
-  //           console.log('✅ Connector created successfully:', res);
+  //           console.log('Connector created successfully:', res);
   //           this.connectors.push(res);
   //           this.cancelCreate();
   //           this.loadConnectors();
@@ -205,7 +204,7 @@ export class GetConnectorType implements OnInit {
 
         this.connectionService.update(id, updatedConnector).subscribe({
           next: (res: any) => {
-            console.log('✅ Connector updated successfully:', res);
+            console.log('Connector updated successfully:', res);
 
             const index = this.connectors.findIndex(c => c.id === id);
             if (index > -1) this.connectors[index] = res;
