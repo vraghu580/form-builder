@@ -14,7 +14,6 @@ export interface ConnectorType {
   displayName: string;
   category: string;
   description?: string;
-  connector_type?: string;
   metadataSchema?: Array<{
     key: string;
     label: string;
@@ -117,7 +116,6 @@ export class GetConnectorType implements OnInit {
     this.metadataSchema.clear();
   }
 
-  /**  Cancel create/edit */
   cancelCreate(): void {
     this.showCreateForm = false;
     this.editId = null;
@@ -165,7 +163,7 @@ export class GetConnectorType implements OnInit {
 
   //       this.connectionService.createConnectionType(newConnector).subscribe({
   //         next: (res: any) => {
-  //           console.log('✅ Connector created successfully:', res);
+  //           console.log('Connector created successfully:', res);
   //           this.connectors.push(res);
   //           this.cancelCreate();
   //           this.loadConnectors();
@@ -205,7 +203,7 @@ export class GetConnectorType implements OnInit {
 
         this.connectionService.update(id, updatedConnector).subscribe({
           next: (res: any) => {
-            console.log('✅ Connector updated successfully:', res);
+            console.log('Connector updated successfully:', res);
 
             const index = this.connectors.findIndex(c => c.id === id);
             if (index > -1) this.connectors[index] = res;
@@ -233,7 +231,7 @@ export class GetConnectorType implements OnInit {
       name: conn.name,
       displayName: conn.displayName,
       category: conn.category,
-      connector_type: conn.connector_type
+      description: conn.description
     });
 
     this.metadataSchema.clear();

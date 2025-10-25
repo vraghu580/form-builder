@@ -27,7 +27,7 @@ interface SourceList {
 })
 export class ConnectManageSource implements OnInit {
 
-  constructor(private connectionService: connectionTypeService, private cdr: ChangeDetectorRef, private router:Router) { }
+  constructor(private connectionService: connectionTypeService, private cdr: ChangeDetectorRef, private router: Router) { }
 
 
   searchsource: string = '';
@@ -151,7 +151,8 @@ loadConnections(): void {
     });
   }
 
-  goToConnector(card: any){
-    this.router.navigate(['/connect-postgresql', card.name]);
+   goToConnector(card: any){
+    this.router.navigate(['/connect-postgresql', card.name])
+
   }
 }

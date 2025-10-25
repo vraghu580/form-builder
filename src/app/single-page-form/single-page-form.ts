@@ -162,9 +162,8 @@ saveForm() {
       id: currentTemplate.id
     };
 
-    // ✅ Correct method for update
     this.templateService.updateTemplate(updatedTemplate);
-    alert('✅ Template updated successfully!');
+    alert(' Template updated successfully!');
   } else {
     const newTemplate: any = {
       ...formStructure,
@@ -172,9 +171,8 @@ saveForm() {
       type: 'single-page'
     };
 
-    // ✅ Correct method for adding new
     this.templateService.updateTemplate(newTemplate);
-    alert('✅ New template saved successfully!');
+    alert('New template saved successfully!');
   }
 
   this.router.navigate(['/formtemplates']);
@@ -190,7 +188,7 @@ saveForm() {
         submittedData[field.label] = field.value || '';
       }
     });
-    console.log('✅ Form Submitted Data:', submittedData);
+    console.log('Form Submitted Data:', submittedData);
   }
 
   trackByIndex(index: number, item: any) {

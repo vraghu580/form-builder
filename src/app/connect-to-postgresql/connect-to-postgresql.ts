@@ -27,12 +27,13 @@ export class ConnectToPostgresql implements OnInit {
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
+  connectionName: string ='';
+
 
   ngOnInit(): void { 
     this.loadMetadata();
-    // Get connector name from route
-this.connectorName = this.route.snapshot.paramMap.get('connectorName') || 'Unknown';
-   
+        this.connectionName = this.route.snapshot.paramMap.get('name') || 'Unknown';
+
   }
 
   loadMetadata() {
@@ -166,4 +167,6 @@ this.connectorName = this.route.snapshot.paramMap.get('connectorName') || 'Unkno
         }
       });
   }
+
+ 
 }
