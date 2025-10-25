@@ -1,14 +1,14 @@
-<div *ngIf="loading" class="text-center mt-10 text-gray-500">
+<!-- <div *ngIf="loading" class="text-center mt-10 text-gray-500">
   Loading connection form...
-</div>
+</div> -->
 
 <div *ngIf="!loading" class="min-h-screen bg-gray-50 p-8 flex justify-center items-start">
   <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-3xl">
     
-    <h2 class="text-2xl font-semibold mb-4">
-      Connect to {{connectionName}} 
-      <!-- <span class="text-gray-500 text-sm ml-2">database</span> -->
-    </h2>
+  <h2 class="text-2xl font-semibold mb-4">
+  Connect to {{ connectorName | titlecase }}
+  <span class="text-gray-500 text-sm ml-2">{{ connectorCategory }}</span>
+</h2>
 
     
     <div class="flex border-b mb-4">

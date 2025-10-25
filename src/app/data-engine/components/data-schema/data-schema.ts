@@ -41,37 +41,37 @@ export class DataSchema implements OnInit {
 
   
   fetchSchema() {
-    const instanceId = localStorage.getItem('connectorInstanceId');
-    if (!instanceId) {
-      console.error(' No connector instance found in localStorage.');
-      this.errorMsg = 'No connector instance found.';
-      this.loading = false;
-      return;
-    }
+    // const instanceId = localStorage.getItem('connectorInstanceId');
+    // if (!instanceId) {
+    //   console.error(' No connector instance found in localStorage.');
+    //   this.errorMsg = 'No connector instance found.';
+    //   this.loading = false;
+    //   return;
+    // }
 
-    console.log(' Fetching schema using instance ID:', instanceId);
+    // console.log(' Fetching schema using instance ID:', instanceId);
 
-    const url = `http://3.6.68.94/services/form-builder/connector-instances/${instanceId}/fetch?mode=api`;
-    const body = {
-      options: {
-        query: 'SELECT * FROM users'
-      }
-    };
+    // const url = `http://3.6.68.94/services/form-builder/connector-instances/${instanceId}/fetch?mode=api`;
+    // const body = {
+    //   options: {
+    //     query: 'SELECT * FROM users'
+    //   }
+    // };
 
-    this.http.post<any>(url, body)
-      .subscribe({
-        next: (res) => {
-          console.log(' Schema Data (From Backend):', res);
-          this.schemaData = res;
-          localStorage.setItem('schemaData', JSON.stringify(res)); 
-          this.loading = false;
-        },
-        error: (err) => {
-          console.error(' Schema fetch failed:', err);
-          this.errorMsg = 'Error fetching schema data.';
-          this.loading = false;
-        }
-      });
+    // this.http.post<any>(url, body)
+    //   .subscribe({
+    //     next: (res) => {
+    //       console.log(' Schema Data (From Backend):', res);
+    //       this.schemaData = res;
+    //       localStorage.setItem('schemaData', JSON.stringify(res)); 
+    //       this.loading = false;
+    //     },
+    //     error: (err) => {
+    //       console.error(' Schema fetch failed:', err);
+    //       this.errorMsg = 'Error fetching schema data.';
+    //       this.loading = false;
+    //     }
+    //   });
   }
 
   backToConnection() {
