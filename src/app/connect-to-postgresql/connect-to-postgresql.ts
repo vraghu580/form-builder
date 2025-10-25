@@ -16,14 +16,13 @@ export class ConnectToPostgresql implements OnInit {
   activeTab: string = 'basic';
   loading: boolean = true;
   connectionStatus: 'idle' | 'testing' | 'success' | 'failed' = 'idle';
-
-  constructor(private fb: FormBuilder, private http: HttpClient, private router: Router) {}
+  metadataLoading: boolean = false;
+  constructor(private fb: FormBuilder, private http: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
     this.loadMetadata();
   }
 
-  // Get metadata
   loadMetadata() {
     this.http.get<any[]>('http://3.6.68.94/services/form-builder/connector-types').subscribe({
       next: (response) => {
@@ -32,22 +31,33 @@ export class ConnectToPostgresql implements OnInit {
         );
         console.log('Postgres Connector:', postgresConnector);
 
+
+        this.loading = false;
+
         if (postgresConnector && postgresConnector.id) {
           const connectorId = postgresConnector.id;
+          this.metadataLoading = true;
 
           this.http.get<any>(`http://3.6.68.94/services/form-builder/connector-types/${connectorId}`).subscribe({
             next: (res) => {
               this.metadataFields = res.metadataSchema || [];
               this.createForm();
-              this.loading = false;
+              this.metadataLoading = false;
+              console.log(' Metadata Fields:', this.metadataFields);
             },
-            error: () => (this.loading = false)
+            error: (err) => {
+              console.error(' Failed  fetch connector metadata:', err);
+              this.metadataLoading = false;
+            }
           });
         } else {
-          this.loading = false;
+          console.warn(' Postgres connector not found in API list');
         }
       },
-      error: () => (this.loading = false)
+      error: (err) => {
+        console.error(' Error fetching connector types:', err);
+        this.loading = false;
+      }
     });
   }
 
@@ -76,41 +86,41 @@ export class ConnectToPostgresql implements OnInit {
     this.activeTab = tabName;
   }
 
-testConnection() {
-  if (this.connectionForm.invalid) {
-    alert('Please fill all required fields');
-    return;
+
+  testConnection() {
+    if (this.connectionForm.invalid) {
+      alert('Please fill all required fields');
+      return;
+    }
+
+    this.connectionStatus = 'testing';
+    const payload = {
+      type: 'postgres',
+      config: this.connectionForm.value
+    };
+
+    console.log('Testing connection with payload:', payload);
+
+    this.http.post<any>('http://3.6.68.94/services/form-builder/connector-instances/test', payload)
+      .subscribe({
+        next: (res) => {
+          console.log(' API Response:', res);
+          if (res.success) {
+            this.connectionStatus = 'success';
+            alert(' Connection Successful!');
+          } else {
+            this.connectionStatus = 'failed';
+            alert(' Connection Failed. Please check your details.');
+          }
+        },
+        error: (err) => {
+          console.error(' Connection test failed:', err);
+          this.connectionStatus = 'failed';
+          alert('Connection Failed. Please check your details.');
+        }
+      });
   }
 
-  this.connectionStatus = 'testing';
-
-  const payload = {
-    type: 'postgres', 
-    config: this.connectionForm.value
-  }; 
-  console.log('Testing connection with payload);', payload);
-
-  this.http.post<any>('http://3.6.68.94/services/form-builder/connector-instances/test', payload)
-    .subscribe({
-      next: (res) => {
-        console.log('✅ API Response:', res);
-
-        // backend should return { success: true } or similar
-        if (res.success) {
-          this.connectionStatus = 'success';
-          alert('✅ Connection Successful!');
-        } else {
-          this.connectionStatus = 'failed';
-          alert('❌ Connection Failed. Please check your details.');
-        }
-      },
-      error: (err) => {
-        console.error('❌ Connection test failed:', err);
-        this.connectionStatus = 'failed';
-        alert('❌ Connection Failed. Please check your details.');
-      }
-    });
-}
 
   connect() {
     if (this.connectionStatus !== 'success') {
@@ -118,13 +128,57 @@ testConnection() {
       return;
     }
 
-    console.log('Connection confirmed. Proceeding to next step...');
-    // Navigate to schema page
-    this.router.navigate(['/data-engine/schema']);
-  }
+    const payload = {
+      connectorTypeId: 'f126d6de-b0bc-405b-85a9-eea86f917683',
+      name: 'postgres',
+      createdBy: 'admin',
+      config: this.connectionForm.value
+    };
 
-  cancel() {
-    this.connectionForm.reset();
-    this.connectionStatus = 'idle';
+    console.log(' Creating Connector Instance with payload:', payload);
+                             
+    this.http.post<any>('http://3.6.68.94/services/form-builder/connector-instances', payload)
+      .subscribe({
+        next: (res) => {
+          console.log(' Connector Instance Created:', res);
+
+          if (res && res.id) {
+            const instanceId = res.id;
+            console.log(' Connector Instance ID:', instanceId);
+
+            const fetchUrl = `http://3.6.68.94/services/form-builder/connector-instances/${instanceId}/fetch?mode=api`;
+            const fetchBody = {
+              options: {
+                query: 'SELECT * FROM users'
+              }
+            };
+
+            console.log(' Fetching schema for instance:', instanceId);
+
+            this.http.post<any>(fetchUrl, fetchBody)
+              .subscribe({
+                next: (data) => {
+                  console.log(' Schema Data (Fetched Successfully):', data);
+                  localStorage.setItem('connectorInstanceId', instanceId);
+                  localStorage.setItem('schemaData', JSON.stringify(data));
+
+                  this.router.navigate(['/data-engine/schema'], {
+                    state: { schemaData: data }
+                  });
+                },
+                error: (err) => {
+                  console.error(' Schema fetch failed after creation:', err);
+                  alert('Schema fetch failed. Check backend logs.');
+                }
+              });
+          } else {
+            console.error(' No connector instance ID returned from backend');
+          }
+        },
+        error: (err) => {
+          console.error(' Error creating connector instance:', err);
+          alert('Failed to create connector instance.');
+        }
+      });
   }
 }
