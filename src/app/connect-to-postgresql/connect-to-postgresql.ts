@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -16,41 +16,68 @@ export class ConnectToPostgresql implements OnInit {
   activeTab: string = 'basic';
   loading: boolean = true;
   connectionStatus: 'idle' | 'testing' | 'success' | 'failed' = 'idle';
+  metadataLoading: boolean = false;
+  connectorName: string = '';  // 👈 dynamic connector name
+  connectorId: string = '';     // 👈 will be set after API call
+
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
   connectionName: string ='';
 
-  constructor(private fb: FormBuilder, private http: HttpClient, private router: Router, private route:ActivatedRoute) {}
 
-  ngOnInit(): void {
+  ngOnInit(): void { 
     this.loadMetadata();
         this.connectionName = this.route.snapshot.paramMap.get('name') || 'Unknown';
 
   }
 
-  // Get metadata
   loadMetadata() {
     this.http.get<any[]>('http://3.6.68.94/services/form-builder/connector-types').subscribe({
       next: (response) => {
-        const postgresConnector = response.find(
-          (item) => item.name?.toLowerCase() === 'postgres' || item.displayName?.toLowerCase().includes('postgres')
+        console.log('All Connectors:', response);
+
+        // ✅ Find connector dynamically based on route name
+        const connector = response.find(
+          (item) =>
+            item.name?.toLowerCase() === this.connectorName ||
+            item.displayName?.toLowerCase().includes(this.connectorName)
         );
-        console.log('Postgres Connector:', postgresConnector);
 
-        if (postgresConnector && postgresConnector.id) {
-          const connectorId = postgresConnector.id;
-
-          this.http.get<any>(`http://3.6.68.94/services/form-builder/connector-types/${connectorId}`).subscribe({
-            next: (res) => {
-              this.metadataFields = res.metadataSchema || [];
-              this.createForm();
-              this.loading = false;
-            },
-            error: () => (this.loading = false)
-          });
+        if (connector && connector.id) {
+          this.connectorId = connector.id;
+          this.fetchMetadata(connector.id);
         } else {
+          console.warn(`No metadata found for connector: ${this.connectorName}`);
           this.loading = false;
         }
       },
-      error: () => (this.loading = false)
+      error: (err) => {
+        console.error('Error fetching connector types:', err);
+        this.loading = false;
+      }
+    });
+  }
+
+  fetchMetadata(connectorId: string) {
+    this.metadataLoading = true;
+
+    this.http.get<any>(`http://3.6.68.94/services/form-builder/connector-types/${connectorId}`).subscribe({
+      next: (res) => {
+        this.metadataFields = res.metadataSchema || [];
+        this.createForm();
+        this.loading = false;
+        this.metadataLoading = false;
+        console.log(`${this.connectorName} Metadata Fields:`, this.metadataFields);
+      },
+      error: (err) => {
+        console.error('Failed to fetch connector metadata:', err);
+        this.metadataLoading = false;
+      }
     });
   }
 
@@ -79,41 +106,39 @@ export class ConnectToPostgresql implements OnInit {
     this.activeTab = tabName;
   }
 
-testConnection() {
-  if (this.connectionForm.invalid) {
-    alert('Please fill all required fields');
-    return;
-  }
+  testConnection() {
+    if (this.connectionForm.invalid) {
+      alert('Please fill all required fields');
+      return;
+    }
 
-  this.connectionStatus = 'testing';
+    this.connectionStatus = 'testing';
+    const payload = {
+      type: this.connectorName, // 👈 dynamic
+      config: this.connectionForm.value
+    };
 
-  const payload = {
-    type: 'postgres', 
-    config: this.connectionForm.value
-  }; 
-  console.log('Testing connection with payload);', payload);
+    console.log('Testing connection with payload:', payload);
 
-  this.http.post<any>('http://3.6.68.94/services/form-builder/connector-instances/test', payload)
-    .subscribe({
-      next: (res) => {
-        console.log('✅ API Response:', res);
-
-        // backend should return { success: true } or similar
-        if (res.success) {
-          this.connectionStatus = 'success';
-          alert('✅ Connection Successful!');
-        } else {
+    this.http.post<any>('http://3.6.68.94/services/form-builder/connector-instances/test', payload)
+      .subscribe({
+        next: (res) => {
+          console.log('API Response:', res);
+          if (res.success) {
+            this.connectionStatus = 'success';
+            alert('Connection Successful!');
+          } else {
+            this.connectionStatus = 'failed';
+            alert('Connection Failed. Please check your details.');
+          }
+        },
+        error: (err) => {
+          console.error('Connection test failed:', err);
           this.connectionStatus = 'failed';
-          alert('❌ Connection Failed. Please check your details.');
+          alert('Connection Failed. Please check your details.');
         }
-      },
-      error: (err) => {
-        console.error('❌ Connection test failed:', err);
-        this.connectionStatus = 'failed';
-        alert('❌ Connection Failed. Please check your details.');
-      }
-    });
-}
+      });
+  }
 
   connect() {
     if (this.connectionStatus !== 'success') {
@@ -121,14 +146,26 @@ testConnection() {
       return;
     }
 
-    console.log('Connection confirmed. Proceeding to next step...');
-    // Navigate to schema page
-    this.router.navigate(['/data-engine/schema']);
-  }
+    const payload = {
+      connectorTypeId: this.connectorId, // 👈 dynamic
+      name: this.connectorName,          // 👈 dynamic
+      createdBy: 'admin',
+      config: this.connectionForm.value
+    };
 
-  cancel() {
-    this.connectionForm.reset();
-    this.connectionStatus = 'idle';
+    console.log('Creating Connector Instance with payload:', payload);
+
+    this.http.post<any>('http://3.6.68.94/services/form-builder/connector-instances', payload)
+      .subscribe({
+        next: (res) => {
+          console.log('Connector Instance Created:', res);
+          // Rest of your existing fetch logic remains same
+        },
+        error: (err) => {
+          console.error('Error creating connector instance:', err);
+          alert('Failed to create connector instance.');
+        }
+      });
   }
 
  

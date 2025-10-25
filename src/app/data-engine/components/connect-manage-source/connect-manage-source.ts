@@ -1,7 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { connectionTypeService } from '../../../services/connection-type-service';
 import { Router } from '@angular/router';
-
 type SourceType = 'database' | 'cloud' | 'api' | 'file';
 
 interface Connection {
