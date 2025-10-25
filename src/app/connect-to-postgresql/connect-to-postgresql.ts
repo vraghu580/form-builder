@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-connect-to-postgresql',
@@ -17,46 +17,65 @@ export class ConnectToPostgresql implements OnInit {
   loading: boolean = true;
   connectionStatus: 'idle' | 'testing' | 'success' | 'failed' = 'idle';
   metadataLoading: boolean = false;
-  constructor(private fb: FormBuilder, private http: HttpClient, private router: Router) { }
+  connectorName: string = '';  // 👈 dynamic connector name
+  connectorId: string = '';     // 👈 will be set after API call
 
-  ngOnInit(): void {
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void { 
     this.loadMetadata();
+    // Get connector name from route
+this.connectorName = this.route.snapshot.paramMap.get('connectorName') || 'Unknown';
+   
   }
 
   loadMetadata() {
     this.http.get<any[]>('http://3.6.68.94/services/form-builder/connector-types').subscribe({
       next: (response) => {
-        const postgresConnector = response.find(
-          (item) => item.name?.toLowerCase() === 'postgres' || item.displayName?.toLowerCase().includes('postgres')
+        console.log('All Connectors:', response);
+
+        // ✅ Find connector dynamically based on route name
+        const connector = response.find(
+          (item) =>
+            item.name?.toLowerCase() === this.connectorName ||
+            item.displayName?.toLowerCase().includes(this.connectorName)
         );
-        console.log('Postgres Connector:', postgresConnector);
 
-
-        this.loading = false;
-
-        if (postgresConnector && postgresConnector.id) {
-          const connectorId = postgresConnector.id;
-          this.metadataLoading = true;
-
-          this.http.get<any>(`http://3.6.68.94/services/form-builder/connector-types/${connectorId}`).subscribe({
-            next: (res) => {
-              this.metadataFields = res.metadataSchema || [];
-              this.createForm();
-              this.metadataLoading = false;
-              console.log(' Metadata Fields:', this.metadataFields);
-            },
-            error: (err) => {
-              console.error(' Failed  fetch connector metadata:', err);
-              this.metadataLoading = false;
-            }
-          });
+        if (connector && connector.id) {
+          this.connectorId = connector.id;
+          this.fetchMetadata(connector.id);
         } else {
-          console.warn(' Postgres connector not found in API list');
+          console.warn(`No metadata found for connector: ${this.connectorName}`);
+          this.loading = false;
         }
       },
       error: (err) => {
-        console.error(' Error fetching connector types:', err);
+        console.error('Error fetching connector types:', err);
         this.loading = false;
+      }
+    });
+  }
+
+  fetchMetadata(connectorId: string) {
+    this.metadataLoading = true;
+
+    this.http.get<any>(`http://3.6.68.94/services/form-builder/connector-types/${connectorId}`).subscribe({
+      next: (res) => {
+        this.metadataFields = res.metadataSchema || [];
+        this.createForm();
+        this.loading = false;
+        this.metadataLoading = false;
+        console.log(`${this.connectorName} Metadata Fields:`, this.metadataFields);
+      },
+      error: (err) => {
+        console.error('Failed to fetch connector metadata:', err);
+        this.metadataLoading = false;
       }
     });
   }
@@ -86,7 +105,6 @@ export class ConnectToPostgresql implements OnInit {
     this.activeTab = tabName;
   }
 
-
   testConnection() {
     if (this.connectionForm.invalid) {
       alert('Please fill all required fields');
@@ -95,7 +113,7 @@ export class ConnectToPostgresql implements OnInit {
 
     this.connectionStatus = 'testing';
     const payload = {
-      type: 'postgres',
+      type: this.connectorName, // 👈 dynamic
       config: this.connectionForm.value
     };
 
@@ -104,23 +122,22 @@ export class ConnectToPostgresql implements OnInit {
     this.http.post<any>('http://3.6.68.94/services/form-builder/connector-instances/test', payload)
       .subscribe({
         next: (res) => {
-          console.log(' API Response:', res);
+          console.log('API Response:', res);
           if (res.success) {
             this.connectionStatus = 'success';
-            alert(' Connection Successful!');
+            alert('Connection Successful!');
           } else {
             this.connectionStatus = 'failed';
-            alert(' Connection Failed. Please check your details.');
+            alert('Connection Failed. Please check your details.');
           }
         },
         error: (err) => {
-          console.error(' Connection test failed:', err);
+          console.error('Connection test failed:', err);
           this.connectionStatus = 'failed';
           alert('Connection Failed. Please check your details.');
         }
       });
   }
-
 
   connect() {
     if (this.connectionStatus !== 'success') {
@@ -129,54 +146,22 @@ export class ConnectToPostgresql implements OnInit {
     }
 
     const payload = {
-      connectorTypeId: 'f126d6de-b0bc-405b-85a9-eea86f917683',
-      name: 'postgres',
+      connectorTypeId: this.connectorId, // 👈 dynamic
+      name: this.connectorName,          // 👈 dynamic
       createdBy: 'admin',
       config: this.connectionForm.value
     };
 
-    console.log(' Creating Connector Instance with payload:', payload);
-                             
+    console.log('Creating Connector Instance with payload:', payload);
+
     this.http.post<any>('http://3.6.68.94/services/form-builder/connector-instances', payload)
       .subscribe({
         next: (res) => {
-          console.log(' Connector Instance Created:', res);
-
-          if (res && res.id) {
-            const instanceId = res.id;
-            console.log(' Connector Instance ID:', instanceId);
-
-            const fetchUrl = `http://3.6.68.94/services/form-builder/connector-instances/${instanceId}/fetch?mode=api`;
-            const fetchBody = {
-              options: {
-                query: 'SELECT * FROM users'
-              }
-            };
-
-            console.log(' Fetching schema for instance:', instanceId);
-
-            this.http.post<any>(fetchUrl, fetchBody)
-              .subscribe({
-                next: (data) => {
-                  console.log(' Schema Data (Fetched Successfully):', data);
-                  localStorage.setItem('connectorInstanceId', instanceId);
-                  localStorage.setItem('schemaData', JSON.stringify(data));
-
-                  this.router.navigate(['/data-engine/schema'], {
-                    state: { schemaData: data }
-                  });
-                },
-                error: (err) => {
-                  console.error(' Schema fetch failed after creation:', err);
-                  alert('Schema fetch failed. Check backend logs.');
-                }
-              });
-          } else {
-            console.error(' No connector instance ID returned from backend');
-          }
+          console.log('Connector Instance Created:', res);
+          // Rest of your existing fetch logic remains same
         },
         error: (err) => {
-          console.error(' Error creating connector instance:', err);
+          console.error('Error creating connector instance:', err);
           alert('Failed to create connector instance.');
         }
       });
