@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { SinglePageForm } from './single-page-form/single-page-form';
 import { MultiStepForm } from './multi-step-form/multi-step-form';
 import { Home } from './home/home';
-import { ConnectorForm } from './connector-type/connector-form/connector-form';
 import { ConnectMysql } from './connect-mysql/connect-mysql';
 import { ConnectToPostgresql } from './connect-to-postgresql/connect-to-postgresql';
 import { ConnectForm } from './connect-form/connect-form';

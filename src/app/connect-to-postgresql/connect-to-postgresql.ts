@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,7 +18,7 @@ export class ConnectToPostgresql implements OnInit {
   connectionStatus: 'idle' | 'testing' | 'success' | 'failed' = 'idle';
   connectionName: string ='';
 
-  constructor(private fb: FormBuilder, private http: HttpClient, private router: Router, private route:ActivatedRoute) {}
+  constructor(private fb: FormBuilder, private http: HttpClient, private router: Router, private route:ActivatedRoute, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.loadMetadata();
@@ -43,6 +43,7 @@ export class ConnectToPostgresql implements OnInit {
               this.metadataFields = res.metadataSchema || [];
               this.createForm();
               this.loading = false;
+              this.cdr.detectChanges()
             },
             error: () => (this.loading = false)
           });
