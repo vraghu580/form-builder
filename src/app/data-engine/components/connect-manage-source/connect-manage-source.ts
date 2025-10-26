@@ -1,7 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { connectionTypeService } from '../../../services/connection-type-service';
 import { Router } from '@angular/router';
-
 type SourceType = 'database' | 'cloud' | 'api' | 'file';
 
 interface Connection {
@@ -54,8 +53,10 @@ loadConnections(): void {
     next: (res: any[]) => {
        console.log('API Response:', res);
       const data: Connection[] = res.map(item => ({
-        name: item.displayName || item.name || 'Untitled',
-        source: item.connector_type || item.category || 'Unknown',
+        name: item.name,
+        connectorTypeId: item.id,
+        source: item.category,
+        metadataSchema: item.metadataSchema,
         kind: this.getKindFromCategory(item.category),
         icon: this.iconName(item.category),
         bgClass: this.iconBgClass(item.category),
@@ -151,9 +152,14 @@ loadConnections(): void {
       return matchesKind && matchesText;
     });
   }
+goToConnector(card: any) {
+  const connectorName = (card.name)
+    .toLowerCase()
+    .replace(/\s+/g, '_'); // handle spaces
+  console.log("CARD_DATA", card);
+  console.log('Navigating to connector:', connectorName);
 
-   goToConnector(card: any){
-    this.router.navigate(['/connect-postgresql', card.name])
-
-  }
-}
+  // navigate to /connect/<connectorName>
+// this.router.navigate(['/connect-postgresql', card.name])}
+  this.router.navigate(['/connect', connectorName], { state: {connectorTypeId:card.connectorTypeId, metadataSchema: card.metadataSchema } });
+}}

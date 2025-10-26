@@ -30,6 +30,8 @@ const routes: Routes = [
    },
   {path:'connect-mysql',component:ConnectMysql},
   {path:'connect-postgresql/:name',component:ConnectToPostgresql},
+  { path: 'connect/:connectorName', component: ConnectToPostgresql },
+
 {path:'connect-form',component:ConnectForm},
 
 
