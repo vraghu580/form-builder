@@ -7,6 +7,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogBox } from '../../components/confirmation-dialog-box/confirmation-dialog-box';
 import { ConnectorTypeMetadataschemaView } from '../../components/dialog/connector-type-metadataschema-view/connector-type-metadataschema-view';
+import { title } from 'process';
 
 export interface ConnectorType {
   id: string;
@@ -86,7 +87,7 @@ export class GetConnectorType implements OnInit {
       label: ['', Validators.required],
       required: [false],
       type: ['', Validators.required],
-      section: [''], 
+      section: [''],
     });
     this.metadataSchema.push(fieldGroup);
   }
@@ -125,67 +126,48 @@ export class GetConnectorType implements OnInit {
   }
 
   createConnectorType(): void {
-    if (this.connectionForm.invalid) return;
+    console.log('Fill All fields')
+    if (this.connectionForm.invalid) {
+      this.connectionForm.markAllAsTouched();
+      return;
+    }
 
     const newConnector = this.connectionForm.value;
 
-    this.connectionService.createConnectionType(newConnector).subscribe({
-      next: (res: any) => {
-        console.log(' Connector created successfully:', res);
-        this.connectors.push(res);
-        this.cancelCreate();
-        this.loadConnectors();
-      },
-      error: (err) => {
-        console.error(' Error creating connector:', err);
-        alert('Failed to create connector.');
+    const dialogRef = this.dialog.open(ConfirmationDialogBox, {
+      width: '400px',
+      data: {
+        title: 'New Connector',
+        message: `Are You sSure Want To Save This Connector "${newConnector.name}"`,
+        confirmText: 'Save',
+        cancelText: 'Cancel',
+      }
+    })
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result == 'confirm') {
+
+        this.connectionService.createConnectionType(newConnector).subscribe({
+          next: (res: any) => {
+            console.log(' Connector created successfully:', res);
+            this.connectors.push(res);
+            this.cancelCreate();
+            this.loadConnectors();
+          },
+          error: (err) => {
+            console.error(' Error creating connector:', err);
+            alert('Failed to create connector.');
+          }
+        });
+      } else {
+        console.log('connection Creation Cancelled by User');
       }
     });
   }
 
-  //    createConnectorType(): void {
-  //   if (this.connectionForm.invalid) {
-  //     alert("Invalid Form");
-  //     return;
-  //   }
-
-  //   const dialogRef = this.dialog.open(ConfirmationDialogBox, {
-  //     width: '400px',
-  //     data: {
-  //       title: 'Save Connector',
-  //       message: `Are you sure you want to save this new connector?`,
-  //       confirmText: 'Save',
-  //       cancelText: 'Cancel',
-  //     },
-  //   });
-
-  //   dialogRef.afterClosed().subscribe((result: boolean) => {
-  //     if (result) {
-  //       const newConnector = this.connectionForm.value;
-
-  //       this.connectionService.createConnectionType(newConnector).subscribe({
-  //         next: (res: any) => {
-  //           console.log('✅ Connector created successfully:', res);
-  //           this.connectors.push(res);
-  //           this.cancelCreate();
-  //           this.loadConnectors();
-  //           alert('Connector saved successfully!');
-  //         },
-  //         error: (err) => {
-  //           console.error(' Error creating connector:', err);
-  //           alert('Failed to create connector.');
-  //         }
-  //       });
-  //     } else {
-  //       console.log('Save cancelled');
-  //     }
-  //   });
-  // }
-
-
   updateConnectorType(id: any): void {
     if (this.connectionForm.invalid) {
-      alert("Invalid Form");
+      alert("Fill All Fields");
       return;
     }
 

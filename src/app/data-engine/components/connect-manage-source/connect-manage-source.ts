@@ -53,7 +53,7 @@ loadConnections(): void {
     next: (res: any[]) => {
        console.log('API Response:', res);
       const data: Connection[] = res.map(item => ({
-        name: item.displayName || item.name || 'Untitled',
+        name: item.name ,
         source: item.connector_type || item.category || 'Unknown',
         kind: this.getKindFromCategory(item.category),
         icon: this.iconName(item.category),

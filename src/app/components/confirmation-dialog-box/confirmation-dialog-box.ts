@@ -21,11 +21,11 @@ export class ConfirmationDialogBox {
   ) {}
 
   onConfirm(): void {
-    this.dialogRef.close(true);
+    this.dialogRef.close('confirm');
   }
 
   onCancel(): void {
-    this.dialogRef.close(false);
+    this.dialogRef.close('cancel');
   }
 
 }
