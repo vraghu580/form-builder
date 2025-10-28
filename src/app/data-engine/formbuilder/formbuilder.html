@@ -1,0 +1,146 @@
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <div class="flex items-center justify-between border-b bg-white px-6 py-4 shadow-sm">
+    <button
+      (click)="back()"
+      class="flex items-center text-gray-600 hover:text-gray-900 font-medium"
+    >
+      ← Back
+    </button>
+
+    <div class="flex items-center gap-3">
+      <input
+        [(ngModel)]="formTitle"
+        type="text"
+        placeholder="Untitled Form"
+        class="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500"
+      />
+      <button
+        (click)="saveForm()"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
+      >
+         Save
+      </button>
+    </div>
+  </div>
+
+  
+<div class="flex flex-col lg:flex-row flex-1 p-4 lg:p-6 gap-4 lg:gap-6">
+
+<div class="w-1/5 bg-white rounded-xl shadow p-4 flex flex-col">
+  <h2 class="text-lg font-semibold mb-3">Form Builder</h2>
+
+  <div class="flex space-x-2 mb-3">
+    <button class="bg-blue-100 text-blue-600 px-3 py-1 rounded-md font-medium">Elements</button>
+    <button class="bg-gray-100 px-3 py-1 rounded-md text-gray-600">Data</button>
+    <button class="bg-gray-100 px-3 py-1 rounded-md text-gray-600">Templates</button>
+  </div>
+
+  <button
+    (click)="addField()"
+    class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg mb-4 font-medium"
+  >
+     Add Field
+  </button>
+
+  <div>
+    <p class="text-xs uppercase text-gray-400 font-medium mb-2">Basic</p>
+    <div class="grid grid-cols-2 gap-2 text-sm">
+      <button
+        (click)="addPredefinedField('text')"
+        class="bg-gray-100 hover:bg-blue-100 py-2 rounded-lg"
+      >
+        Text
+      </button>
+      <button
+        (click)="addPredefinedField('email')"
+        class="bg-gray-100 hover:bg-blue-100 py-2 rounded-lg"
+      >
+        Email
+      </button>
+      <button
+        (click)="addPredefinedField('number')"
+        class="bg-gray-100 hover:bg-blue-100 py-2 rounded-lg"
+      >
+        Number
+      </button>
+      <button
+        (click)="addPredefinedField('date')"
+        class="bg-gray-100 hover:bg-blue-100 py-2 rounded-lg"
+      >
+        Date
+      </button>
+      <button
+        (click)="addPredefinedField('textarea')"
+        class="bg-gray-100 hover:bg-blue-100 py-2 rounded-lg"
+      >
+        Textarea
+      </button>
+      <button
+        (click)="addPredefinedField('checkbox')"
+        class="bg-gray-100 hover:bg-blue-100 py-2 rounded-lg"
+      >
+        Checkbox
+      </button>
+    </div>
+  </div>
+</div>
+
+
+    
+<div class="w-full lg:w-3/5 bg-white rounded-xl shadow p-6 mt-4 lg:mt-0">
+      <h2 class="text-xl font-semibold mb-2">{{ formTitle }}</h2>
+      <p class="text-gray-500 text-sm mb-6">Fill out the form below</p>
+
+      <form [formGroup]="formGroup" class="space-y-4">
+        <div
+          *ngFor="let field of fields; let i = index"
+          (click)="selectField(field)"
+          [class.border-blue-500]="selectedField === field"
+          class="border border-gray-200 hover:border-blue-300 rounded-lg p-3 cursor-pointer transition"
+        >
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            {{ field.displayLabel || field.columnName }}
+          </label>
+          <input
+            [type]="getInputType(field.dataType)"
+            [placeholder]="field.placeholder || 'Enter ' + (field.columnName || 'value')"
+            formControlName="{{ field.columnName }}"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+        </div>
+      </form>
+    </div>
+
+    
+<div class="w-full lg:w-1/5 bg-white rounded-xl shadow p-4 mt-4 lg:mt-0">
+      <h2 class="text-lg font-semibold mb-3">Element Configuration</h2>
+
+      <div *ngIf="selectedField; else noSelection">
+        <p class="text-sm text-gray-500 mb-1">
+          <strong>Key:</strong> {{ selectedField.columnName }}
+        </p>
+        <p class="text-sm text-gray-500 mb-3">
+          <strong>Type:</strong> {{ selectedField.dataType }}
+        </p>
+
+        <label class="block text-sm font-medium mb-1">Display Label</label>
+        <input
+          [(ngModel)]="selectedField.displayLabel"
+          (input)="updateSelectedField('displayLabel', selectedField.displayLabel)"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3"
+        />
+
+        <label class="block text-sm font-medium mb-1">Placeholder</label>
+        <input
+          [(ngModel)]="selectedField.placeholder"
+          (input)="updateSelectedField('placeholder', selectedField.placeholder)"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2"
+        />
+      </div>
+
+      <ng-template #noSelection>
+        <p class="text-gray-400 italic text-sm mt-6 text-center">Select a field to configure</p>
+      </ng-template>
+    </div>
+  </div>
+</div>

@@ -6,20 +6,24 @@ import { DataSchema } from './components/data-schema/data-schema';
 import { DataEngineRoutingModule } from './data-engine-routing-module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-
+import { Formbuilder } from './formbuilder/formbuilder';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
   declarations: [
     DataEngineMain,
     ConnectManageSource,
-    DataSchema
+    DataSchema,
+    Formbuilder
   ],
   imports: [
     CommonModule,
     DataEngineRoutingModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    ReactiveFormsModule,
+    
   ]
 })
 export class DataEngineModule { }

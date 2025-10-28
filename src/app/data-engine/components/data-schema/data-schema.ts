@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -9,72 +8,88 @@ import { Router } from '@angular/router';
   styleUrls: ['./data-schema.scss']
 })
 export class DataSchema implements OnInit {
-
   loading = true;
-  schemaData: any;
+  schemaList: any[] = [];
   errorMsg = '';
+  selectedColumns: any[] = [];
+  selectedTable: any = null;
+  searchQuery: string = '';
+  hoveredRow: number | null = null;
+  checkedColumns: Set<string> = new Set();
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private router: Router, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    
-    const navState = history.state;
-    if (navState && navState.schemaData) {
-      console.log('📦 Received Schema Data from previous screen:', navState.schemaData);
-      this.schemaData = navState.schemaData;
-      this.loading = false;
-      return;
-    }
-
-    
+    console.log(' DataSchema initialized');
     const savedSchema = localStorage.getItem('schemaData');
     if (savedSchema) {
-      console.log('📂 Loaded schema data from localStorage:', JSON.parse(savedSchema));
-      this.schemaData = JSON.parse(savedSchema);
+      const parsed = JSON.parse(savedSchema);
+      this.handleSchemaData(parsed);
+    } else {
       this.loading = false;
+      this.errorMsg = 'No schema data found.';
+    }
+  }
+
+  handleSchemaData(data: any) {
+    if (data?.result && Array.isArray(data.result)) {
+      this.schemaList = data.result;
+      this.selectedTable = this.schemaList[0];
+      this.loading = false;
+      this.cdr.detectChanges();
+    } else {
+      this.errorMsg = 'Invalid schema data format.';
+      this.loading = false;
+    }
+  }
+
+  get filteredColumns() {
+    if (!this.searchQuery) return this.selectedTable?.columns || [];
+    return this.selectedTable?.columns.filter((col: any) =>
+      col.columnName.toLowerCase().includes(this.searchQuery.toLowerCase())
+    );
+  }
+
+
+  onTableSelect(event: any) {
+    const selectedName = event.target.value;
+    this.selectedTable = this.schemaList.find(t => t.tableName === selectedName);
+    this.checkedColumns.clear();
+  }
+
+  toggleCheckbox(columnName: string) {
+    if (this.checkedColumns.has(columnName)) {
+      this.checkedColumns.delete(columnName);
+    } else {
+      this.checkedColumns.add(columnName);
+    }
+  }
+
+
+  setHover(index: number | null) {
+    this.hoveredRow = index;
+  }
+
+  onImportToFormBuilder() {
+    const selectedColumnsData = this.selectedTable.columns.filter((col: any) =>
+      this.checkedColumns.has(col.columnName)
+    );
+
+    console.log('📤 Sending selected columns to Form Builder:', selectedColumnsData);
+
+    if (selectedColumnsData.length === 0) {
+      alert('Please select at least one column to import.');
       return;
     }
 
     
-    this.fetchSchema();
-  }
+    localStorage.setItem('importedColumns', JSON.stringify(selectedColumnsData));
 
-  
-  fetchSchema() {
-    // const instanceId = localStorage.getItem('connectorInstanceId');
-    // if (!instanceId) {
-    //   console.error(' No connector instance found in localStorage.');
-    //   this.errorMsg = 'No connector instance found.';
-    //   this.loading = false;
-    //   return;
-    // }
+    alert(`Importing ${this.checkedColumns.size} column(s) to Form Builder...`);
 
-    // console.log(' Fetching schema using instance ID:', instanceId);
-
-    // const url = `http://3.6.68.94/services/form-builder/connector-instances/${instanceId}/fetch?mode=api`;
-    // const body = {
-    //   options: {
-    //     query: 'SELECT * FROM users'
-    //   }
-    // };
-
-    // this.http.post<any>(url, body)
-    //   .subscribe({
-    //     next: (res) => {
-    //       console.log(' Schema Data (From Backend):', res);
-    //       this.schemaData = res;
-    //       localStorage.setItem('schemaData', JSON.stringify(res)); 
-    //       this.loading = false;
-    //     },
-    //     error: (err) => {
-    //       console.error(' Schema fetch failed:', err);
-    //       this.errorMsg = 'Error fetching schema data.';
-    //       this.loading = false;
-    //     }
-    //   });
-  }
-
-  backToConnection() {
-    this.router.navigate(['/data-engine/connect-manage']);
+    
+    this.router.navigate(['/data-engine/form-builder'], {
+      state: { importedColumns: selectedColumnsData }
+    });
   }
 }

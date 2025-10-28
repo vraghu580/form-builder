@@ -7,6 +7,7 @@ import { ConnectorForm } from './connector-type/connector-form/connector-form';
 import { ConnectMysql } from './connect-mysql/connect-mysql';
 import { ConnectToPostgresql } from './connect-to-postgresql/connect-to-postgresql';
 import { ConnectForm } from './connect-form/connect-form';
+import { Formbuilder } from './data-engine/formbuilder/formbuilder';
 
 const routes: Routes = [
   { path: 'home', component: Home,
@@ -31,7 +32,6 @@ const routes: Routes = [
   {path:'connect-mysql',component:ConnectMysql},
   {path:'connect-postgresql/:name',component:ConnectToPostgresql},
   { path: 'connect/:connectorName', component: ConnectToPostgresql },
-
 {path:'connect-form',component:ConnectForm},
 
 

@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ConnectManageSource } from './components/connect-manage-source/connect-manage-source';
 import { DataEngineMain } from './components/data-engine-main/data-engine-main';
 import { DataSchema } from './components/data-schema/data-schema';
+import { Formbuilder } from './formbuilder/formbuilder';
 
 const routes: Routes = [
 
@@ -26,6 +27,7 @@ const routes: Routes = [
         icon:'bi bi-database-fill',
       },
        },
+       {path:'form-builder',component:Formbuilder},
     ]
   },
 ];
