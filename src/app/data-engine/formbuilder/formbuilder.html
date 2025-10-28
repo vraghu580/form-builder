@@ -1,141 +1,146 @@
 <div class="flex flex-col min-h-screen bg-gray-50">
+  <!-- Top Header -->
   <div class="flex items-center justify-between border-b bg-white px-6 py-4 shadow-sm">
-    <button
-      (click)="back()"
-      class="flex items-center text-gray-600 hover:text-gray-900 font-medium"
-    >
+    <button (click)="back()" class="flex items-center text-gray-600 hover:text-gray-900 font-medium">
       ← Back
     </button>
 
     <div class="flex items-center gap-3">
-      <input
-        [(ngModel)]="formTitle"
-        type="text"
-        placeholder="Untitled Form"
-        class="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500"
-      />
-      <button
-        (click)="saveForm()"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
-      >
-         Save
+      <input [(ngModel)]="formTitle" type="text" placeholder="Untitled Form"
+        class="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500" />
+      <button (click)="saveForm()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium">
+        Save
       </button>
     </div>
   </div>
 
-  
-<div class="flex flex-col lg:flex-row flex-1 p-4 lg:p-6 gap-4 lg:gap-6">
+  <!-- Main Layout -->
+  <div class="flex flex-col lg:flex-row flex-1 p-4 lg:p-6 gap-4 lg:gap-6">
 
-<div class="w-1/5 bg-white rounded-xl shadow p-4 flex flex-col">
-  <h2 class="text-lg font-semibold mb-3">Form Builder</h2>
+    <!-- Left Panel -->
+    <div class="w-1/5 bg-white rounded-xl shadow p-4 flex flex-col">
+      <h2 class="text-lg font-medium mb-3">Form Builder</h2>
 
-  <div class="flex space-x-2 mb-3">
-    <button class="bg-blue-100 text-blue-600 px-3 py-1 rounded-md font-medium">Elements</button>
-    <button class="bg-gray-100 px-3 py-1 rounded-md text-gray-600">Data</button>
-    <button class="bg-gray-100 px-3 py-1 rounded-md text-gray-600">Templates</button>
-  </div>
+      <div class="flex space-x-2 mb-3">
+        <button (click)="activeTab = 'elements'"
+          [ngClass]="{'bg-blue-100 text-blue-600': activeTab === 'elements', 'bg-gray-100 text-gray-600': activeTab !== 'elements'}"
+          class="px-3 py-1 rounded-md font-medium">Elements</button>
+        <button (click)="activeTab = 'data'"
+          [ngClass]="{'bg-blue-100 text-blue-600': activeTab === 'data', 'bg-gray-100 text-gray-600': activeTab !== 'data'}"
+          class="px-3 py-1 rounded-md font-medium">Data</button>
+        <button (click)="activeTab = 'templates'"
+          [ngClass]="{'bg-blue-100 text-blue-600': activeTab === 'templates', 'bg-gray-100 text-gray-600': activeTab !== 'templates'}"
+          class="px-3 py-1 rounded-md font-medium">Templates</button>
+      </div>
 
-  <button
-    (click)="addField()"
-    class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg mb-4 font-medium"
-  >
-     Add Field
-  </button>
+      <!-- Elements Tab -->
+      <div *ngIf="activeTab === 'elements'">
+        <button (click)="addField()" class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg mb-4 font-medium">
+          Add Field
+        </button>
 
-  <div>
-    <p class="text-xs uppercase text-gray-400 font-medium mb-2">Basic</p>
-    <div class="grid grid-cols-2 gap-2 text-sm">
-      <button
-        (click)="addPredefinedField('text')"
-        class="bg-gray-100 hover:bg-blue-100 py-2 rounded-lg"
-      >
-        Text
-      </button>
-      <button
-        (click)="addPredefinedField('email')"
-        class="bg-gray-100 hover:bg-blue-100 py-2 rounded-lg"
-      >
-        Email
-      </button>
-      <button
-        (click)="addPredefinedField('number')"
-        class="bg-gray-100 hover:bg-blue-100 py-2 rounded-lg"
-      >
-        Number
-      </button>
-      <button
-        (click)="addPredefinedField('date')"
-        class="bg-gray-100 hover:bg-blue-100 py-2 rounded-lg"
-      >
-        Date
-      </button>
-      <button
-        (click)="addPredefinedField('textarea')"
-        class="bg-gray-100 hover:bg-blue-100 py-2 rounded-lg"
-      >
-        Textarea
-      </button>
-      <button
-        (click)="addPredefinedField('checkbox')"
-        class="bg-gray-100 hover:bg-blue-100 py-2 rounded-lg"
-      >
-        Checkbox
-      </button>
+        <p class="text-xs uppercase text-gray-400 font-medium mb-2">Basic</p>
+        <div class="grid grid-cols-2 gap-2 text-sm">
+          <button *ngFor="let type of basicFields" (click)="addPredefinedField(type)"
+            class="bg-gray-100 hover:bg-blue-100 py-2 rounded-lg">
+            {{ type | titlecase }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Data Tab -->
+      <div *ngIf="activeTab === 'data'" class="mt-3">
+        <h3 class="text-sm font-semibold mb-2">Connected Sources</h3>
+        <ul class="space-y-2 text-sm">
+          <li *ngFor="let source of connectedSources"
+            class="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg">
+            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+            {{ source }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Templates Tab -->
+      <div *ngIf="activeTab === 'templates'" class="text-gray-500 italic text-sm mt-4">
+        Coming soon...
+      </div>
     </div>
-  </div>
-</div>
 
-
-    
-<div class="w-full lg:w-3/5 bg-white rounded-xl shadow p-6 mt-4 lg:mt-0">
-      <h2 class="text-xl font-semibold mb-2">{{ formTitle }}</h2>
+    <!-- Center Panel -->
+    <div class="w-full lg:w-3/5 bg-white rounded-xl shadow p-6 mt-4 lg:mt-0">
+      <h2 class="text-xl font-medium mb-2">{{ formTitle }}</h2>
       <p class="text-gray-500 text-sm mb-6">Fill out the form below</p>
 
       <form [formGroup]="formGroup" class="space-y-4">
-        <div
-          *ngFor="let field of fields; let i = index"
-          (click)="selectField(field)"
+        <div *ngFor="let field of fields" (click)="selectField(field)"
           [class.border-blue-500]="selectedField === field"
-          class="border border-gray-200 hover:border-blue-300 rounded-lg p-3 cursor-pointer transition"
-        >
+          class="border border-gray-200 hover:border-blue-300 rounded-lg p-3 cursor-pointer transition">
           <label class="block text-sm font-medium text-gray-700 mb-1">
             {{ field.displayLabel || field.columnName }}
           </label>
-          <input
-            [type]="getInputType(field.dataType)"
+          <input [type]="getInputType(field.dataType)"
             [placeholder]="field.placeholder || 'Enter ' + (field.columnName || 'value')"
             formControlName="{{ field.columnName }}"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-          />
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none" />
         </div>
       </form>
     </div>
 
-    
-<div class="w-full lg:w-1/5 bg-white rounded-xl shadow p-4 mt-4 lg:mt-0">
-      <h2 class="text-lg font-semibold mb-3">Element Configuration</h2>
+    <!-- Right Panel -->
+    <div class="w-full lg:w-1/5 bg-white rounded-xl shadow p-4 mt-4 lg:mt-0">
+      <h2 class="text-lg font-medium mb-3">Element Configuration</h2>
 
       <div *ngIf="selectedField; else noSelection">
-        <p class="text-sm text-gray-500 mb-1">
-          <strong>Key:</strong> {{ selectedField.columnName }}
-        </p>
-        <p class="text-sm text-gray-500 mb-3">
-          <strong>Type:</strong> {{ selectedField.dataType }}
-        </p>
+        <!-- Tabs -->
+        <div class="flex space-x-2 mb-3 text-sm">
+          <button (click)="configTab = 'properties'"
+            [ngClass]="{'bg-blue-100 text-blue-600': configTab === 'properties', 'bg-gray-100 text-gray-600': configTab !== 'properties'}"
+            class="px-2 py-1 rounded-md">Properties</button>
+          <button (click)="configTab = 'validation'"
+            [ngClass]="{'bg-blue-100 text-blue-600': configTab === 'validation', 'bg-gray-100 text-gray-600': configTab !== 'validation'}"
+            class="px-2 py-1 rounded-md">Validation</button>
+          <button (click)="configTab = 'styling'"
+            [ngClass]="{'bg-blue-100 text-blue-600': configTab === 'styling', 'bg-gray-100 text-gray-600': configTab !== 'styling'}"
+            class="px-2 py-1 rounded-md">Styling</button>
+        </div>
 
-        <label class="block text-sm font-medium mb-1">Display Label</label>
-        <input
-          [(ngModel)]="selectedField.displayLabel"
-          (input)="updateSelectedField('displayLabel', selectedField.displayLabel)"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3"
-        />
+        <!-- Properties -->
+        <div *ngIf="configTab === 'properties'">
+          <p class="text-sm text-gray-500 mb-1"><strong>Key:</strong> {{ selectedField.columnName }}</p>
+          <p class="text-sm text-gray-500 mb-3"><strong>Type:</strong> {{ selectedField.dataType }}</p>
 
-        <label class="block text-sm font-medium mb-1">Placeholder</label>
-        <input
-          [(ngModel)]="selectedField.placeholder"
-          (input)="updateSelectedField('placeholder', selectedField.placeholder)"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2"
-        />
+          <label class="block text-sm font-medium mb-1">Display Label</label>
+          <input [(ngModel)]="selectedField.displayLabel"
+            (input)="updateSelectedField('displayLabel', selectedField.displayLabel)"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3" />
+
+          <label class="block text-sm font-medium mb-1">Placeholder</label>
+          <input [(ngModel)]="selectedField.placeholder"
+            (input)="updateSelectedField('placeholder', selectedField.placeholder)"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+        </div>
+
+        <!-- Validation -->
+        <div *ngIf="configTab === 'validation'">
+          <label class="flex items-center space-x-2 mb-3">
+            <input type="checkbox" [(ngModel)]="selectedField.required"
+              (change)="updateSelectedField('required', selectedField.required)" />
+            <span class="text-sm">Required Field</span>
+          </label>
+
+          <div>
+            <label class="block text-sm font-medium mb-1">Validation Rules</label>
+            <input [(ngModel)]="selectedField.validationRules"
+              (input)="updateSelectedField('validationRules', selectedField.validationRules)"
+              placeholder="e.g., minLength:3, maxLength:20"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+          </div>
+        </div>
+
+        <!-- Styling -->
+        <div *ngIf="configTab === 'styling'" class="text-gray-500 text-sm italic">
+          Styling options coming soon...
+        </div>
       </div>
 
       <ng-template #noSelection>
