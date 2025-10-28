@@ -16,11 +16,16 @@
 
         <!-- Basic Fields -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
           <div>
             <label class="block font-medium text-gray-700 mb-1">Name</label>
             <input type="text" formControlName="name"
               class="border border-gray-300 rounded-lg w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
               placeholder="Enter connection name" />
+            <div *ngIf="connectionForm.get('name')?.invalid && connectionForm.get('name')?.touched"
+              class="text-red-500 text-sm mt-1">
+              Please enter a name
+            </div>
           </div>
 
           <div>
@@ -28,6 +33,10 @@
             <input type="text" formControlName="displayName"
               class="border border-gray-300 rounded-lg w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
               placeholder="Enter display name" />
+            <div *ngIf="connectionForm.get('displayName')?.invalid && connectionForm.get('displayName')?.touched"
+              class="text-red-500 text-sm mt-1">
+              Please enter a display name
+            </div>
           </div>
 
           <div>
@@ -38,9 +47,8 @@
               <option value="database">Database</option>
               <option value="api">API</option>
               <option value="file">File</option>
-              <option value="cloud">Cloud </option>
+              <option value="cloud">Cloud</option>
             </select>
-
             <div *ngIf="connectionForm.get('category')?.invalid && connectionForm.get('category')?.touched"
               class="text-red-500 text-sm mt-1">
               Please select a category
@@ -48,10 +56,14 @@
           </div>
 
           <div>
-            <label class="block font-medium text-gray-700 mb-1">description</label>
+            <label class="block font-medium text-gray-700 mb-1">Description</label>
             <input type="text" formControlName="description"
               class="border border-gray-300 rounded-lg w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              placeholder="e.g. SQL, NoSQL" />
+              placeholder="Enter Connector Discription" />
+            <div *ngIf="connectionForm.get('description')?.invalid && connectionForm.get('description')?.touched"
+              class="text-red-500 text-sm mt-1">
+              Please enter a description
+            </div>
           </div>
         </div>
 
